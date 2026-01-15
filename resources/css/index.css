@@ -1,0 +1,37 @@
+.glass-panel {
+    background: hsl(0 0% 100% / 0.7);
+    backdrop-filter: blur(24px);
+    border: 1px solid hsl(0 0% 100% / 0.5);
+    box-shadow: 0 20px 40px hsl(25 30% 20% / 0.1);
+    border-radius: 1rem;
+}
+
+.dark .glass-panel {
+    background: hsl(0 0% 100% / 0.1);
+    border-color: hsl(0 0% 100% / 0.1);
+}
+
+.glass-panel-strong {
+    background: hsl(0 0% 100% / 0.85);
+    backdrop-filter: blur(32px);
+    border: 1px solid hsl(0 0% 100% / 0.6);
+    box-shadow: 0 30px 60px hsl(25 30% 20% / 0.15);
+    border-radius: 1rem;
+}
+
+.glass-button {
+    backdrop-filter: blur(16px);
+    transition: all 0.3s ease;
+}
+
+.glass-button:active {
+    transform: scale(0.98);
+}
+
+.text-gradient {
+    background: linear-gradient(to right,
+            var(--color-primary),
+            var(--color-accent-foreground));
+    -webkit-background-clip: text;
+    color: transparent;
+}
