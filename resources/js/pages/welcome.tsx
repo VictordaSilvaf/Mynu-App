@@ -24,6 +24,7 @@ import Logo from "@/assets/images/logo.png";
 import { Link, usePage } from "@inertiajs/react";
 import { dashboard, login, register } from "@/routes";
 import { SharedData, User } from "@/types";
+import { PricingPage } from "@/components/pricing/PricingPage";
 
 const features = [
     { icon: Check, text: "Fácil de usar" },
@@ -75,9 +76,9 @@ export default function Landing() {
 
                     {/* Desktop Nav */}
                     <div className="hidden md:flex items-center gap-6">
-                        <a href="#banner" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Home</a>
-                        <a href="#how" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Features</a>
-                        <a href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Pricing</a>
+                        <a href="#banner" className="text-sm text-muted-foreground transition-colors hover:border-b hover:border-primary hover:text-primary">Início</a>
+                        <a href="#how" className="text-sm text-muted-foreground transition-colors hover:border-b hover:border-primary hover:text-primary">Recursos</a>
+                        <a href="#pricing" className="text-sm text-muted-foreground transition-colors hover:border-b hover:border-primary hover:text-primary">Preços</a>
                     </div>
 
                     <div className="hidden md:flex gap-3">
@@ -405,8 +406,12 @@ export default function Landing() {
                 </div>
             </section>
 
+            <section className="pt-4" id="pricing">
+                <PricingPage />
+            </section>
+
             {/* Lead Capture */}
-            <section className="py-16 px-4" id="pricing">
+            <section className="py-16 px-4">
                 <div className="max-w-xl mx-auto">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
