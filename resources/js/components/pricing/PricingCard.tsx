@@ -2,23 +2,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { PricingFeature } from "./PricingFeature";
 import { Zap } from "lucide-react";
-
-interface Feature {
-  text: string;
-  icon?: "check" | "sparkles" | "chart" | "users" | "headphones" | "layers" | "qr" | "image" | "palette";
-}
-
-interface PricingCardProps {
-  name: string;
-  description: string;
-  price: string;
-  priceNote?: string;
-  features: Feature[];
-  buttonText: string;
-  isPopular?: boolean;
-  isCurrentPlan?: boolean;
-  onButtonClick?: () => void;
-}
+import { Plan } from "@/types";
 
 export function PricingCard({
   name,
@@ -30,7 +14,7 @@ export function PricingCard({
   isPopular = false,
   isCurrentPlan = false,
   onButtonClick,
-}: PricingCardProps) {
+}: Plan & { onButtonClick: () => void } & { price: number }) {
   return (
     <div
       className={cn(
@@ -58,7 +42,7 @@ export function PricingCard({
 
       <div className="mb-6">
         <div className="flex items-baseline gap-1">
-          <span className="text-4xl font-bold text-foreground">{price}</span>
+          <span className="text-4xl font-bold text-foreground">R$ {price}</span>
           {priceNote && (
             <span className="text-sm text-muted-foreground">{priceNote}</span>
           )}

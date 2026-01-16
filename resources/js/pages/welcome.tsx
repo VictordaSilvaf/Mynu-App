@@ -23,7 +23,7 @@ import spaghettiImg from "@/assets/images/3.jpeg";
 import Logo from "@/assets/images/logo.png";
 import { Link, usePage } from "@inertiajs/react";
 import { dashboard, login, register } from "@/routes";
-import { SharedData, User } from "@/types";
+import { PlansMap, SharedData, User } from "@/types";
 import { PricingPage } from "@/components/pricing/PricingPage";
 
 const features = [
@@ -39,7 +39,7 @@ const steps = [
     { icon: Send, title: "Publique", desc: "Compartilhe o menu" },
 ];
 
-export default function Landing() {
+export default function Landing({ plans }: { plans: PlansMap }) {
     const { auth, name } = usePage<SharedData>().props;
     const [email, setEmail] = useState("");
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -407,7 +407,8 @@ export default function Landing() {
             </section>
 
             <section className="pt-4" id="pricing">
-                <PricingPage />
+                <PricingPage plans={plans} />
+                
             </section>
 
             {/* Lead Capture */}
