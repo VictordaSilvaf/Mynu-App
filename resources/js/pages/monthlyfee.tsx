@@ -1,19 +1,17 @@
 import { PricingPage } from '@/components/pricing/PricingPage';
 import AppLayout from '@/layouts/app-layout';
-import subscription from '@/routes/subscription';
-import { Plans, type BreadcrumbItem } from '@/types';
+import { monthlyfee } from '@/routes';
+import { PlansMap, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Assinatura',
-        href: subscription().url,
+        href: monthlyfee().url,
     },
 ];
 
-export default function Subscription(plans: Plans[]) {
-    
-
+export default function MonthlyFee({ plans }: { plans: PlansMap }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Assinaturas" />

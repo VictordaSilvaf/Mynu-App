@@ -31,11 +31,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         })->name('menus');
     });
 
-    Route::get('subscription', function () {
-        return Inertia::render('subscription', [
-            'plans' => config('plans'),
+    Route::get('monthlyfee', function () {
+        return Inertia::render('monthlyfee', [
+            'plans' => config('plans')['plans'],
         ]);
-    })->name('subscription');
+    })->name('monthlyfee');
 });
 
 require __DIR__.'/settings.php';
+require __DIR__.'/subscription.php';

@@ -10,10 +10,10 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard, menus, subscription } from '@/routes';
+import { dashboard, menus, monthlyfee } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, ClipboardList, Folder, LayoutGrid, Sparkle } from 'lucide-react';
+import { ClipboardList, LayoutGrid, Sparkle } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -29,7 +29,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Minha Assinatura',
-        href: subscription(),
+        href: monthlyfee(),
         icon: Sparkle,
     },
 ];
