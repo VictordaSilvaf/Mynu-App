@@ -25,6 +25,7 @@ import { Link, usePage } from "@inertiajs/react";
 import { dashboard, login, register } from "@/routes";
 import { PlansMap, SharedData, User } from "@/types";
 import { PricingPage } from "@/components/pricing/PricingPage";
+import { MenuMobile } from "@/components/menu-mobile";
 
 const features = [
     { icon: Check, text: "Fácil de usar" },
@@ -109,6 +110,10 @@ export default function Landing({ plans }: { plans: PlansMap }) {
                         </div>
                     </div>
 
+                    <div className="flex md:hidden gap-3">
+                        <ThemeToggle />
+                        <MenuMobile user={auth.user} />{/* Menu content can go here if needed */}
+                    </div>
                 </GlassPanel>
 
                 {/* Mobile Menu */}
@@ -119,16 +124,24 @@ export default function Landing({ plans }: { plans: PlansMap }) {
                         className="md:hidden mt-2"
                     >
                         <GlassPanel className="p-4 flex flex-col gap-3">
-                            <a href="#features" className="text-sm py-2">Home</a>
-                            <a href="#how" className="text-sm py-2">Features</a>
-                            <a href="#pricing" className="text-sm py-2">Pricing</a>
+                            <Link href="#banner" className="text-sm py-2">Início</Link>
+                            <Link href="#how" className="text-sm py-2">Recursos</Link>
+                            <Link href="#pricing" className="text-sm py-2">Preços</Link>
 
-                            <Link href={login()} className="w-full bg-primary text-primary-foreground rounded-full">
-                                Login
-                            </Link>
-                            <Link href={register()} className="w-full bg-primary text-primary-foreground rounded-full">
-                                Register
-                            </Link>
+                            {auth.user ? (
+                                <Link href={dashboard()} className="w-full bg-primary text-primary-foreground rounded-full">
+                                    Dashboard
+                                </Link>
+                            ) : (
+                                <>
+                                    <Link href={login()} className="w-full bg-primary text-primary-foreground rounded-full">
+                                        Login
+                                    </Link>
+                                    <Link href={register()} className="w-full bg-primary text-primary-foreground rounded-full">
+                                        Register
+                                    </Link>
+                                </>
+                            )}
                         </GlassPanel>
                     </motion.div>
                 )}
@@ -408,7 +421,7 @@ export default function Landing({ plans }: { plans: PlansMap }) {
 
             <section className="pt-4" id="pricing">
                 <PricingPage plans={plans} />
-                
+
             </section>
 
             {/* Lead Capture */}
