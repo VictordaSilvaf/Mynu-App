@@ -11,6 +11,46 @@
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
 
+    <title>Cardápio Digital com QR Code | Mynu</title>
+    <meta name="description"
+        content="Crie seu cardápio digital com QR Code em minutos. Ideal para restaurantes, bares e lanchonetes. Comece grátis.">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://mynu.com.br" />
+
+    <!-- Robots -->
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Idioma -->
+    <meta http-equiv="content-language" content="pt-BR" />
+
+    <!-- Autor (branding) -->
+    <meta name="author" content="Mynu" />
+
+    <!-- Keywords (baixo peso, mas ok usar 3 a 5) -->
+    <meta name="keywords" content="cardápio digital, cardápio qr code, menu digital restaurante, cardápio online" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Mynu" />
+    <meta property="og:title" content="Cardápio Digital com QR Code | Mynu" />
+    <meta property="og:description"
+        content="Crie seu cardápio digital com QR Code em minutos. Ideal para restaurantes, bares e lanchonetes." />
+    <meta property="og:url" content="https://mynu.com.br" />
+    <meta property="og:image" content="https://mynu.com.br/og-image.png" />
+    <meta property="og:locale" content="pt_BR" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Cardápio Digital com QR Code | Mynu" />
+    <meta name="twitter:description"
+        content="Cardápio digital moderno para restaurantes. QR Code, rápido e sem custo inicial." />
+    <meta name="twitter:image" content="https://mynu.com.br/og-image.png" />
+
+    <meta name="application-name" content="Mynu" />
+    <meta name="apple-mobile-web-app-title" content="Mynu" />
+    <meta name="format-detection" content="telephone=no" />
+
     {{-- Lógica de Tema Otimizada --}}
     <script>
         (function () {
