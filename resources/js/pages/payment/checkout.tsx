@@ -4,8 +4,9 @@ import { Input } from '@/components/ui/input';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { loadStripe, type Appearance } from '@stripe/stripe-js';
 import { AlertCircle, CheckCircle2, CreditCard, Lock, Shield } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
+import { useMemo, useState, type FormEvent } from 'react';
 import { Head } from '@inertiajs/react';
+import { CheckoutProvider } from '@stripe/react-stripe-js/checkout';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY || '');
 
@@ -74,7 +75,7 @@ function CheckoutForm({ plan, billing, amount, currency }: Omit<PaymentProps, 'c
 
             <div className="space-y-4">
                 <div>
-                    <label htmlFor="email" className="mb-2 block text-sm font-medium text-foreground">
+                    <label htmlFor="email" className="mb-2 block text-sm font-bold text-foreground">
                         Email para recibo
                     </label>
                     <Input
@@ -89,8 +90,8 @@ function CheckoutForm({ plan, billing, amount, currency }: Omit<PaymentProps, 'c
                 </div>
 
                 <div>
-                    <label className="mb-2 block text-sm font-medium text-foreground">
-                        Informações do cartão
+                    <label className="mb-4 block text-sm font-bold text-foreground!">
+                        Informações de pagamento
                     </label>
                     <PaymentElement
                         options={{
