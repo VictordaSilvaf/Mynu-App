@@ -9,23 +9,18 @@ import {
     QrCode,
     Layers,
     Send,
-    Menu,
-    X
+    MenuIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GlassPanel } from "@/components/ui/GlassPanel";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
-
 import risotoImg from "@/assets/images/1.jpeg";
 import picanhaImg from "@/assets/images/2.jpeg";
 import spaghettiImg from "@/assets/images/3.jpeg";
-import Logo from "@/assets/images/logo.png";
-import { Link, usePage } from "@inertiajs/react";
-import { dashboard, login, register } from "@/routes";
-import { PlansMap, SharedData, User } from "@/types";
+import { PlansMap } from "@/types";
 import { PricingPage } from "@/components/pricing/PricingPage";
-import { MenuMobile } from "@/components/menu-mobile";
+import Menu from "@/components/ui/menu";
+import Footer from "@/components/ui/footer";
 
 const features = [
     { icon: Check, text: "Fácil de usar" },
@@ -41,10 +36,8 @@ const steps = [
 ];
 
 export default function Landing({ plans }: { plans: PlansMap }) {
-    const { auth, name } = usePage<SharedData>().props;
     const [email, setEmail] = useState("");
     const [isSubmitted, setIsSubmitted] = useState(false);
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const { scrollYProgress } = useScroll({ target: containerRef });
 
@@ -60,92 +53,7 @@ export default function Landing({ plans }: { plans: PlansMap }) {
 
     return (
         <div ref={containerRef} className="min-h-screen bg-background overflow-x-hidden">
-            {/* Mobile-first Navbar */}
-            <motion.nav
-                initial={{ y: -100 }}
-                animate={{ y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="fixed top-0 left-0 right-0 z-50 px-4 py-3"
-            >
-                <GlassPanel className="px-4 py-2.5 flex items-center justify-between !rounded-full max-w-7xl mx-auto">
-                    <div className="flex items-center gap-2">
-                        <div className="w-12 h-12 rounded-lg">
-                            <img src={Logo} alt="mynu logo" className="w-full h-full object-cover rounded-lg" />
-                        </div>
-                        <span className="font-semibold text-lg text-foreground uppercase">{name}</span>
-                    </div>
-
-                    {/* Desktop Nav */}
-                    <div className="hidden md:flex items-center gap-6">
-                        <a href="#banner" className="text-sm text-muted-foreground transition-colors hover:border-b hover:border-primary hover:text-primary">Início</a>
-                        <a href="#how" className="text-sm text-muted-foreground transition-colors hover:border-b hover:border-primary hover:text-primary">Recursos</a>
-                        <a href="#pricing" className="text-sm text-muted-foreground transition-colors hover:border-b hover:border-primary hover:text-primary">Preços</a>
-                    </div>
-
-                    <div className="hidden md:flex gap-3">
-                        {auth.user ? (
-                            <Link href={dashboard()} className="bg-primary flex justify-center items-center hover:bg-primary/90 text-primary-foreground rounded-full px-6 text-sm font-medium">
-                                Dashboard
-                            </Link>
-                        ) : (
-                            <>
-                                <Link href={login()} className="bg-primary flex justify-center items-center hover:bg-primary/60 text-primary-foreground rounded-full px-6 text-sm font-medium duration-300">
-                                    Login
-                                </Link>
-                                <Link href={register()} className="border !border-primary flex justify-center items-center hover:bg-primary/20 text-primary rounded-full px-6 text-sm font-medium duration-300">
-                                    Register
-                                </Link>
-                            </>
-                        )}
-
-                        {/* Theme Toggle + Mobile Menu */}
-                        <div className="flex items-center gap-2">
-                            <ThemeToggle />
-                            <button
-                                className="md:hidden p-2"
-                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            >
-                                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="flex md:hidden gap-3">
-                        <ThemeToggle />
-                        <MenuMobile user={auth.user} />{/* Menu content can go here if needed */}
-                    </div>
-                </GlassPanel>
-
-                {/* Mobile Menu */}
-                {mobileMenuOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="md:hidden mt-2"
-                    >
-                        <GlassPanel className="p-4 flex flex-col gap-3">
-                            <Link href="#banner" className="text-sm py-2">Início</Link>
-                            <Link href="#how" className="text-sm py-2">Recursos</Link>
-                            <Link href="#pricing" className="text-sm py-2">Preços</Link>
-
-                            {auth.user ? (
-                                <Link href={dashboard()} className="w-full bg-primary text-primary-foreground rounded-full">
-                                    Dashboard
-                                </Link>
-                            ) : (
-                                <>
-                                    <Link href={login()} className="w-full bg-primary text-primary-foreground rounded-full">
-                                        Login
-                                    </Link>
-                                    <Link href={register()} className="w-full bg-primary text-primary-foreground rounded-full">
-                                        Register
-                                    </Link>
-                                </>
-                            )}
-                        </GlassPanel>
-                    </motion.div>
-                )}
-            </motion.nav>
+            <Menu />
 
             {/* Hero Section - Mobile First */}
             <section id="banner" className="relative min-h-screen px-4 pt-24 pb-12 flex flex-col lg:flex-row lg:items-center lg:justify-between lg:px-8 xl:px-16 max-w-7xl mx-auto">
@@ -387,7 +295,7 @@ export default function Landing({ plans }: { plans: PlansMap }) {
                                 <Eye className="w-4 h-4 text-muted-foreground" />
                                 <span className="text-sm font-medium">Seder</span>
                                 <div className="ml-auto">
-                                    <Menu className="w-4 h-4 text-muted-foreground" />
+                                    <MenuIcon className="w-4 h-4 text-muted-foreground" />
                                 </div>
                             </div>
 
@@ -476,20 +384,7 @@ export default function Landing({ plans }: { plans: PlansMap }) {
                 </div>
             </section>
 
-            {/* Footer */}
-            <footer className="py-8 px-4 border-t border-border/50">
-                <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center">
-                            <Smartphone className="w-3 h-3 text-primary-foreground" />
-                        </div>
-                        <span className="font-medium text-sm">mynu</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                        © 2024 mynu. Todos os direitos reservados.
-                    </p>
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 }

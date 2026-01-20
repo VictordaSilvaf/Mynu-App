@@ -3,6 +3,7 @@ import { LucideIcon } from 'lucide-react';
 
 export interface Auth {
   user: User;
+  roles: string[];
 }
 
 export interface BreadcrumbItem {
@@ -137,10 +138,10 @@ export interface Plan {
   features: Feature[];
 
   isFree: boolean;
-  isCurrentPlan: boolean;
 
   priceNote?: string;
   buttonText: string;
+  buttonLink?: string;
 }
 
 export type PlanKey = 'free' | 'pro' | 'enterprise';

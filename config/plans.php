@@ -27,8 +27,8 @@ return [
                 ['text' => 'Templates básicos', 'icon' => 'palette'],
             ],
             'isFree' => true,
-            'isCurrentPlan' => false,
             'buttonText' => 'Começar Agora',
+            'buttonLink' => '/login',
         ],
 
         'pro' => [
@@ -49,7 +49,6 @@ return [
                 ['text' => 'Analytics básico', 'icon' => 'chart'],
             ],
             'isFree' => false,
-            'isCurrentPlan' => false,
             'buttonText' => 'Escolher Pro',
         ],
 
@@ -73,7 +72,6 @@ return [
                 ['text' => 'Múltiplos usuários', 'icon' => 'users'],
             ],
             'isFree' => false,
-            'isCurrentPlan' => false,
             'buttonText' => 'Contatar Vendas',
         ],
     ],

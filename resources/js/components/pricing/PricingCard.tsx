@@ -12,9 +12,11 @@ export function PricingCard({
   features,
   buttonText,
   isPopular = false,
-  isCurrentPlan = false,
+  roles,
   onButtonClick,
-}: Plan & { onButtonClick: () => void } & { price: number }) {
+}: Plan & { onButtonClick: () => void } & { price: number } & { roles?: string[] }) {
+  const isCurrentPlan = roles?.includes(name.toLowerCase());
+
   return (
     <div
       className={cn(

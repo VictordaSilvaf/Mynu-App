@@ -24,7 +24,7 @@ class PaymentMethodController extends Controller
     {
         $user = $request->user();
 
-        return Inertia::render('subscription/payment-methods', [
+        return Inertia::render('payment/methods', [
             'intent' => $user->createSetupIntent(),
             'payment_methods' => $user->paymentMethods(),
             'default_payment_method' => $user->defaultPaymentMethod(),

@@ -1,19 +1,25 @@
 import { useState } from "react";
 import { PricingToggle } from "./PricingToggle";
 import { PricingCard } from "./PricingCard";
-import { payment } from "@/routes";
-import { router } from "@inertiajs/react";
-import { PlansMap } from "@/types";
+import { router, usePage } from "@inertiajs/react";
+import { PlansMap, SharedData } from "@/types";
+import payment from "@/routes/payment";
 
 export function PricingPage({
     plans,
 }: {
     plans: PlansMap;
 }) {
+    const { auth } = usePage<SharedData>().props;
     const [isAnnual, setIsAnnual] = useState(false);
 
     const handlePlanClick = (planName: string, price_id: string) => {
-        router.visit(payment({ plan: planName, billing: isAnnual ? 'annual' : 'monthly', price_id: price_id }));
+        if (planName === "free" || !auth.user) {
+            router.visit("/login");
+            return;
+        }
+
+        router.visit(payment.checkout({ plan: planName, billing: isAnnual ? 'annual' : 'monthly', price_id: price_id }));
     };
 
     return (
@@ -39,7 +45,8 @@ export function PricingPage({
                         <PricingCard
                             {...plans.free}
                             price={0}
-                            onButtonClick={() => null}
+                            onButtonClick={() => handlePlanClick("free", plans.free.price_id)}
+                            roles={auth.roles}
                         />
                     </div>
                     <div className="animate-fade-in [animation-delay:200ms] md:-mt-4 md:mb-4">
@@ -47,6 +54,7 @@ export function PricingPage({
                             {...plans.pro}
                             price={isAnnual ? plans.pro.yearlyPrice : plans.pro.monthlyPrice}
                             onButtonClick={() => handlePlanClick("pro", plans.pro.price_id)}
+                            roles={auth.roles}
                         />
                     </div>
                     <div className="animate-fade-in [animation-delay:300ms]">
@@ -54,6 +62,7 @@ export function PricingPage({
                             {...plans.enterprise}
                             price={isAnnual ? plans.enterprise.yearlyPrice : plans.enterprise.monthlyPrice}
                             onButtonClick={() => handlePlanClick("enterprise", plans.enterprise.price_id)}
+                            roles={auth.roles}
                         />
                     </div>
                 </div>
