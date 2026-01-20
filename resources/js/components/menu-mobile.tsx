@@ -14,12 +14,15 @@ import { dashboard, login, register } from "@/routes"
 import Logo from "@/assets/images/logo.png";
 import { DialogTitle } from "@radix-ui/react-dialog"
 
-export function MenuMobile({ user }: { user: User | null }) {
+export function MenuMobile({ user, isActive }: { user: User | null, isActive: (path: string) => boolean }) {
     const { name } = usePage<SharedData>().props;
     const menuItems = [
-        { label: "Início", href: "#banner" },
-        { label: "Recursos", href: "#how" },
-        { label: "Preços", href: "#pricing" },
+        { name: 'Início', href: '/' },
+        { name: 'Recursos', href: '/features' },
+        { name: 'Preços', href: '/pricing' },
+        { name: 'Sobre', href: '/about' },
+        { name: 'FAQ', href: '/faq' },
+        { name: 'Contato', href: '/contact' },
     ]
 
     return (
@@ -48,27 +51,31 @@ export function MenuMobile({ user }: { user: User | null }) {
                         <DrawerClose key={item.href} asChild>
                             <a
                                 href={item.href}
-                                className="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                className={`block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${isActive(item.href)
+                                    ? "text-primary font-semibold"
+                                    : "text-muted-foreground"}`}
                             >
-                                {item.label}
+                                {item.name}
                             </a>
                         </DrawerClose>
                     ))}
 
-                    {user ? (
-                        <Link href={dashboard()} className="bg-primary flex justify-center items-center hover:bg-primary/90 text-primary-foreground rounded-full py-3 px-6 text-sm font-medium">
-                            Dashboard
-                        </Link>
-                    ) : (
-                        <>
-                            <Link href={login()} className="bg-primary flex justify-center items-center hover:bg-primary/60 text-primary-foreground rounded-full py-3 px-6 text-sm font-medium duration-300">
-                                Login
+                    <div className="mt-6 gap-3 flex flex-col">
+                        {user ? (
+                            <Link href={dashboard()} className="bg-primary flex justify-center items-center hover:bg-primary/90 text-primary-foreground rounded-full py-3 px-6 text-sm font-medium">
+                                Dashboard
                             </Link>
-                            <Link href={register()} className="border !border-primary flex justify-center items-center hover:bg-primary/20 text-primary rounded-full py-3 px-6 text-sm font-medium duration-300">
-                                Register
-                            </Link>
-                        </>
-                    )}
+                        ) : (
+                            <>
+                                <Link href={login()} className="bg-primary flex justify-center items-center hover:bg-primary/60 text-primary-foreground rounded-full py-3 px-6 text-sm font-medium duration-300">
+                                    Login
+                                </Link>
+                                <Link href={register()} className="border !border-primary flex justify-center items-center hover:bg-primary/20 text-primary rounded-full py-3 px-6 text-sm font-medium duration-300">
+                                    Register
+                                </Link>
+                            </>
+                        )}
+                    </div>
                 </nav>
             </DrawerContent>
         </Drawer>

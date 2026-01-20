@@ -88,7 +88,7 @@ export default function Menu() {
 
                 <div className="flex md:hidden gap-3">
                     <ThemeToggle />
-                    <MenuMobile user={auth.user} />{/* Menu content can go here if needed */}
+                    <MenuMobile user={auth.user} isActive={isActive} />{/* Menu content can go here if needed */}
                 </div>
             </GlassPanel>
 
