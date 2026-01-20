@@ -1,7 +1,6 @@
 import { motion, useScroll, useTransform } from "motion/react";
 import { useRef, useState } from "react";
 import {
-    Smartphone,
     Eye,
     Zap,
     Check,
@@ -182,7 +181,7 @@ export default function Landing({ plans }: { plans: PlansMap }) {
                                         <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center">
                                             <ArrowRight className="w-3 h-3 rotate-180 text-muted-foreground" />
                                         </div>
-                                        <span className="text-xs font-medium">Dishes</span>
+                                        <span className="text-xs font-medium">Pratos</span>
                                         <div className="w-6 h-6" />
                                     </div>
 
@@ -194,17 +193,17 @@ export default function Landing({ plans }: { plans: PlansMap }) {
                                         >
                                             <GlassPanel className="p-3 !rounded-xl">
                                                 <div className="flex items-center justify-between mb-2">
-                                                    <span className="text-xs font-medium">Grilled Steak</span>
-                                                    <span className="text-xs font-semibold text-primary">$14</span>
+                                                    <span className="text-xs font-medium">Bife Grelhado</span>
+                                                    <span className="text-xs font-semibold text-primary">R$ 14</span>
                                                 </div>
                                                 <img
                                                     src={picanhaImg}
-                                                    alt="Steak"
+                                                    alt="Bife"
                                                     className="w-full h-24 object-cover rounded-lg mb-2"
                                                 />
                                                 <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
                                                     <Zap className="w-3 h-3 text-primary" />
-                                                    <span>In course</span>
+                                                    <span>Em andamento</span>
                                                 </div>
                                             </GlassPanel>
                                         </motion.div>
@@ -215,12 +214,12 @@ export default function Landing({ plans }: { plans: PlansMap }) {
                                         >
                                             <GlassPanel className="p-3 !rounded-xl">
                                                 <div className="flex items-center justify-between mb-2">
-                                                    <span className="text-xs font-medium">Spaghetti Bolognes</span>
-                                                    <span className="text-xs font-semibold text-primary">$12</span>
+                                                    <span className="text-xs font-medium">Espaguete à Bolonhesa</span>
+                                                    <span className="text-xs font-semibold text-primary">R$ 12</span>
                                                 </div>
                                                 <img
                                                     src={spaghettiImg}
-                                                    alt="Spaghetti"
+                                                    alt="Espaguete"
                                                     className="w-full h-20 object-cover rounded-lg"
                                                 />
                                             </GlassPanel>
@@ -248,17 +247,17 @@ export default function Landing({ plans }: { plans: PlansMap }) {
                         {/* Dishes Panel */}
                         <GlassPanel className="p-6">
                             <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-lg font-semibold">Dishes</h3>
+                                <h3 className="text-lg font-semibold">Pratos</h3>
                                 <Button size="sm" className="bg-primary text-primary-foreground rounded-full text-xs px-4">
-                                    Add dish
+                                    Adicionar prato
                                 </Button>
                             </div>
 
                             <div className="space-y-4">
                                 {[
-                                    { img: picanhaImg, name: "Grilled Steak", price: "$14", cat: "Medium" },
-                                    { img: spaghettiImg, name: "Spaghetti Bolognese", price: "$12", cat: "Main Course" },
-                                    { img: risotoImg, name: "Risotto", price: "$10", cat: "Hunger" },
+                                    { img: picanhaImg, name: "Bife Grelhado", price: "R$ 14", cat: "Médio" },
+                                    { img: spaghettiImg, name: "Espaguete à Bolonhesa", price: "R$ 12", cat: "Prato Principal" },
+                                    { img: risotoImg, name: "Risoto", price: "R$ 10", cat: "Fome" },
                                 ].map((dish, i) => (
                                     <motion.div
                                         key={dish.name}
@@ -281,10 +280,10 @@ export default function Landing({ plans }: { plans: PlansMap }) {
 
                             <div className="flex gap-3 mt-6">
                                 <Button variant="outline" className="flex-1 rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground text-sm">
-                                    Upload Photo
+                                    Enviar Foto
                                 </Button>
                                 <Button variant="outline" className="flex-1 rounded-full text-sm">
-                                    Generate 3D Model
+                                    Gerar Modelo 3D
                                 </Button>
                             </div>
                         </GlassPanel>
@@ -293,7 +292,7 @@ export default function Landing({ plans }: { plans: PlansMap }) {
                         <GlassPanel className="p-6">
                             <div className="flex items-center gap-2 mb-6">
                                 <Eye className="w-4 h-4 text-muted-foreground" />
-                                <span className="text-sm font-medium">Seder</span>
+                                <span className="text-sm font-medium">Visualizar</span>
                                 <div className="ml-auto">
                                     <MenuIcon className="w-4 h-4 text-muted-foreground" />
                                 </div>
@@ -301,9 +300,9 @@ export default function Landing({ plans }: { plans: PlansMap }) {
 
                             <div className="space-y-6">
                                 {[
-                                    { title: "Starters", items: [["Caesar Salad", "$10"], ["Spaghetti Bolognese", "$12"]] },
-                                    { title: "Main Course", items: [["Grilled Steak", "$14"], ["Margherita Pizza", "$13"]] },
-                                    { title: "Desserts", items: [["Tiramisu", "$8"]] },
+                                    { title: "Entradas", items: [["Salada Caesar", "R$ 10"], ["Espaguete à Bolonhesa", "R$ 12"]] },
+                                    { title: "Prato Principal", items: [["Bife Grelhado", "R$ 14"], ["Pizza Margherita", "R$ 13"]] },
+                                    { title: "Sobremesas", items: [["Tiramisú", "R$ 8"]] },
                                 ].map((section) => (
                                     <div key={section.title}>
                                         <h4 className="text-sm font-medium text-muted-foreground mb-2">{section.title}</h4>
@@ -320,7 +319,7 @@ export default function Landing({ plans }: { plans: PlansMap }) {
                             </div>
 
                             <Button className="w-full mt-6 bg-primary text-primary-foreground rounded-full">
-                                Publish Menu
+                                Publicar Menu
                             </Button>
                         </GlassPanel>
                     </motion.div>
@@ -329,7 +328,6 @@ export default function Landing({ plans }: { plans: PlansMap }) {
 
             <section className="pt-4" id="pricing">
                 <PricingPage plans={plans} />
-
             </section>
 
             {/* Lead Capture */}

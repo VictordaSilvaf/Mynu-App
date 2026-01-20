@@ -44,7 +44,9 @@ export function PricingCard({
 
       <div className="mb-6">
         <div className="flex items-baseline gap-1">
-          <span className="text-4xl font-bold text-foreground">R$ {price}</span>
+          <span className="text-4xl font-bold text-foreground">
+            R$ {price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
           {priceNote && (
             <span className="text-sm text-muted-foreground">{priceNote}</span>
           )}
