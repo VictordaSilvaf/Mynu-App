@@ -1,9 +1,9 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { dashboard, monthlyfee } from '@/routes';
+import { dashboard } from '@/routes';
 import { Head, router } from '@inertiajs/react';
-import { useStripe } from '@stripe/react-stripe-js';
-import { Elements, loadStripe } from '@stripe/stripe-js';
+import { Elements, useStripe } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 import { AlertCircle, CreditCard, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
