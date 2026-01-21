@@ -135,10 +135,9 @@ export default function Payment({ plan, billing, price_id, clientSecret, amount,
     const appearance: Appearance = {
         theme: 'stripe',
         variables: {
-            colorPrimary: 'hsl(var(--primary))',
-            colorBackground: 'hsl(var(--background))',
-            colorText: 'hsl(var(--foreground))',
-            colorDanger: 'hsl(var(--destructive))',
+            colorPrimary: '#ff7a00',
+            colorText: '#2d1810',
+            colorDanger: '#f87171',
             fontFamily: 'system-ui, sans-serif',
             borderRadius: '0.5rem',
         },
