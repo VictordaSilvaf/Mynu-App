@@ -13,7 +13,7 @@ import {
 import { dashboard, home, menus } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { ClipboardList, LayoutGrid, Sparkle } from 'lucide-react';
+import { ClipboardList, HouseIcon, LayoutGrid, Sparkle } from 'lucide-react';
 import AppLogo from './app-logo';
 import { index as subscriptionIndex } from '@/routes/subscription';
 
@@ -38,7 +38,8 @@ const mainNavItems: NavItem[] = [
 const footerNavItems: NavItem[] = [
     {
         title: 'MYNU',
-        href: 'https://mynu.com',
+        href: home(),
+        icon: HouseIcon,
     },
 ];
 
