@@ -25,6 +25,7 @@ class StripeEventListener
                     break;
 
                 case 'invoice.payment_succeeded':
+                case 'payment_intent.succeeded':
                     $this->handlePaymentSuccess($payload);
                     break;
 
@@ -98,7 +99,13 @@ class StripeEventListener
     {
         $object = $payload['data']['object'];
         $stripeId = $object['customer'];
-        $invoiceUrl = $object['hosted_invoice_url']; // Link da fatura em PDF
+        $invoiceUrl = null;
+        if (isset($object['hosted_invoice_url'])) {
+            $invoiceUrl = $object['hosted_invoice_url']; // Link da fatura em PDF
+        }
+
+        // Log do objeto completo para depuração
+        Log::info('Payment data received', ['object' => $object, 'stripeId' => $stripeId]);
 
         $user = User::where('stripe_id', $stripeId)->first();
 
@@ -111,7 +118,7 @@ class StripeEventListener
         Log::info("Pagamento confirmado para o usuário: {$user->email}. Fatura: {$invoiceUrl}");
 
         // 2. Opcional: Atualizar a data de expiração ou status no seu banco
-        // $user->update(['trial_ends_at' => null, 'last_payment_at' => now()]);
+        // $user->update(['ends_at' => null, 'last_payment_at' => now()]);
 
         // 3. Opcional: Notificar o usuário via Email/Notificação
         // $user->notify(new PaymentReceivedNotification($invoiceUrl));
