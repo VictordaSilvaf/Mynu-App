@@ -6,7 +6,7 @@ import { Plan } from "@/types";
 
 export function PricingCard({
   name,
-  description,
+  description = "",
   price,
   priceNote,
   features,
@@ -16,6 +16,9 @@ export function PricingCard({
   onButtonClick,
 }: Plan & { onButtonClick: () => void } & { price: number } & { roles?: string[] }) {
   const isCurrentPlan = roles?.includes(name.toLowerCase());
+  const normalizedFeatures = features.map((feature) =>
+    typeof feature === "string" ? { text: feature, icon: "check" as const } : feature
+  );
 
   return (
     <div
@@ -81,7 +84,7 @@ export function PricingCard({
       </div>
 
       <ul className="flex-1 space-y-3">
-        {features.map((feature, index) => (
+        {normalizedFeatures.map((feature, index) => (
           <PricingFeature key={index} icon={feature.icon}>
             {feature.text}
           </PricingFeature>

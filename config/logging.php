@@ -127,6 +127,20 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'stripe_webhooks_success' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/stripe/webhooks-success.log'),
+            'level' => 'info',
+            'days' => 14,
+        ],
+
+        'stripe_webhooks_error' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/stripe/webhooks-error.log'),
+            'level' => 'error',
+            'days' => 30,
+        ],
+
     ],
 
 ];

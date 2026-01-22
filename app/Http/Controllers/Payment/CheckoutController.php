@@ -3,17 +3,18 @@
 namespace App\Http\Controllers\Payment;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Laravel\Fortify\Features;
+use Laravel\Cashier\Checkout;
 
 class CheckoutController extends Controller
 {
     /**
      * Display payment checkout page.
      */
-    public function show(Request $request, string $plan, string $billing, ?string $priceId = null): Response
+    public function show(Request $request, string $plan, string $billing, ?string $priceId = null): Response|Checkout|RedirectResponse
     {
         $plans = config('plans.plans');
 
@@ -31,70 +32,41 @@ class CheckoutController extends Controller
             ]);
         }
 
-        $amount = $billing === 'annual' ? $planData['yearlyPrice'] : $planData['monthlyPrice'];
-        $amountInCents = (int) ($amount * 100);
-
         $user = $request->user();
-        $clientSecret = null;
 
-        try {
-            if ($user) {
-                if (! $user->hasStripeId()) {
-                    $user->createAsStripeCustomer();
-                }
+        // Redireciona para Stripe Checkout usando Cashier
+        if ($user) {
+            if (! $user->hasStripeId()) {
+                $user->createAsStripeCustomer();
+            }
 
-                $paymentIntent = $user->pay(
-                    $amountInCents,
-                    [
-                        'currency' => strtolower($planData['currency']),
-                        'description' => "Assinatura {$planData['name']} - {$billing}",
-                        'metadata' => [
-                            'plan' => $plan,
-                            'billing' => $billing,
-                            'price_id' => $priceId ?? $planData['price_id'],
-                        ],
-                    ]
-                );
+            // Determina o price ID correto baseado no billing
+            $stripePriceId = $billing === 'annual'
+                ? ($planData['price_id_yearly'] ?? $planData['price_id'])
+                : ($planData['price_id_monthly'] ?? $planData['price_id']);
 
-                $clientSecret = $paymentIntent->client_secret;
-            } else {
-                $stripe = new \Stripe\StripeClient(config('cashier.secret'));
+            // Se foi passado um priceId explícito na URL, usa ele (mas valida se é price_ e não prod_)
+            if ($priceId && str_starts_with($priceId, 'price_')) {
+                $stripePriceId = $priceId;
+            }
 
-                $paymentIntent = $stripe->paymentIntents->create([
-                    'amount' => $amountInCents,
-                    'currency' => strtolower($planData['currency']),
-                    'description' => "Assinatura {$planData['name']} - {$billing}",
-                    'metadata' => [
+            return $user->newSubscription('default', $stripePriceId)
+                ->trialDays(config('plans.trial_days', 0))
+                ->checkout([
+                    'success_url' => route('payment.success', [
                         'plan' => $plan,
                         'billing' => $billing,
-                        'price_id' => $priceId ?? $planData['price_id'],
-                    ],
-                    'automatic_payment_methods' => [
-                        'enabled' => true,
-                    ],
+                    ]),
+                    'cancel_url' => route('payment.cancelled', [
+                        'reason' => 'user_cancelled',
+                        'plan' => $plan,
+                        'billing' => $billing,
+                    ]),
                 ]);
-
-                $clientSecret = $paymentIntent->client_secret;
-            }
-        } catch (\Exception $e) {
-            report($e);
-
-            return Inertia::render('payment/cancelled', [
-                'reason' => 'processing_error',
-                'plan' => $plan,
-                'billing' => $billing,
-            ]);
         }
 
-        return Inertia::render('payment/checkout', [
-            'canRegister' => Features::enabled(Features::registration()),
-            'plan' => $plan,
-            'billing' => $billing,
-            'price_id' => $priceId ?? $planData['price_id'],
-            'clientSecret' => $clientSecret,
-            'amount' => $amountInCents,
-            'currency' => strtolower($planData['currency']),
-        ]);
+        // Para usuários não autenticados, redireciona para login
+        return redirect()->route('login');
     }
 
     /**

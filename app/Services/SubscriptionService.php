@@ -150,8 +150,10 @@ final class SubscriptionService
             'subscribed' => $subscription->active(),
             'on_trial' => $subscription->onTrial(),
             'on_grace_period' => $subscription->onGracePeriod(),
-            'cancelled' => $subscription->cancelled(),
-            'ends_at' => $subscription->ends_at?->toIso8601String(),
+            'cancelled' => $subscription->canceled(),
+            'ends_at' => $subscription->onTrial()
+                ? $subscription->trial_ends_at?->toIso8601String()
+                : $subscription->ends_at?->toIso8601String(),
             'stripe_status' => $subscription->stripe_status,
         ];
     }

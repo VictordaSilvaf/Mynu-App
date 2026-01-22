@@ -15,119 +15,171 @@ class StripeEventListener
     public function handle(WebhookReceived $event): void
     {
         $payload = $event->payload;
-        $type = $payload['type'];
+        $type = $payload['type'] ?? null;
 
         try {
-            switch ($type) {
-                case 'checkout.session.completed':
-                case 'customer.subscription.created':
-                    $this->handleSubscriptionChange($payload);
-                    break;
+            match ($type) {
+                'checkout.session.completed',
+                'customer.subscription.created' => $this->syncUserSubscription($payload),
 
-                case 'invoice.payment_succeeded':
-                case 'payment_intent.succeeded':
-                    $this->handlePaymentSuccess($payload);
-                    break;
+                'invoice.payment_succeeded',
+                'payment_intent.succeeded' => $this->handlePaymentSuccess($payload),
 
-                case 'customer.subscription.deleted':
-                    $this->handleSubscriptionDeleted($payload);
-                    break;
-            }
+                'customer.subscription.deleted' => $this->handleSubscriptionDeleted($payload),
+
+                default => null,
+            };
         } catch (Throwable $e) {
-            Log::error("Erro ao processar Webhook Stripe [{$type}]: ".$e->getMessage());
+            Log::error("Stripe Webhook Error [{$type}]: {$e->getMessage()}", [
+                'payload' => $payload,
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
     }
 
     /**
-     * Gerencia a atribuição de permissões (Roles) ao usuário.
+     * Centraliza a lógica de sincronização de assinatura e roles.
      */
-    private function handleSubscriptionChange(array $payload): void
+    private function syncUserSubscription(array $payload): void
     {
-        $stripeId = $payload['data']['object']['customer'];
+        $object = $payload['data']['object'];
+        $stripeId = $object['customer'] ?? null;
 
-        // No Stripe, os itens ficam dentro de 'lines' ou 'display_items' dependendo do evento
-        $data = $payload['data']['object'];
-        $priceId = $data['lines']['data'][0]['price']['id'] ?? $data['metadata']['price_id'] ?? null;
+        if (! $user = $this->findUser($stripeId)) {
+            return;
+        }
 
-        if (! $priceId) {
-            Log::warning("Price ID não encontrado no payload do Stripe para o cliente: {$stripeId}");
+        // Para customer.subscription.created - cria no banco se não existir
+        if ($payload['type'] === 'customer.subscription.created') {
+            $subscriptionId = $object['id'];
+            $priceId = $object['items']['data'][0]['price']['id'] ?? null;
+
+            if (! $priceId) {
+                Log::warning("Price ID missing for subscription: {$subscriptionId}");
+
+                return;
+            }
+
+            // Verifica se a subscription já existe no banco
+            $existingSubscription = $user->subscriptions()
+                ->where('stripe_id', $subscriptionId)
+                ->first();
+
+            if (! $existingSubscription) {
+                // Cria a subscription no banco
+                $user->subscriptions()->create([
+                    'type' => $object['metadata']['name'] ?? 'default',
+                    'stripe_id' => $subscriptionId,
+                    'stripe_status' => $object['status'],
+                    'stripe_price' => $priceId,
+                    'quantity' => $object['items']['data'][0]['quantity'] ?? 1,
+                    'trial_ends_at' => $object['trial_end'] ? now()->timestamp($object['trial_end']) : null,
+                    'ends_at' => $object['ended_at'] ? now()->timestamp($object['ended_at']) : null,
+                ]);
+
+                Log::info('Subscription created in database', [
+                    'user_id' => $user->id,
+                    'subscription_id' => $subscriptionId,
+                ]);
+            }
+
+            $role = $this->getRoleFromPriceId($priceId);
+            $user->syncRoles([$role]);
+
+            Log::info('User subscription synced', [
+                'email' => $user->email,
+                'role' => $role,
+                'subscription_id' => $subscriptionId,
+            ]);
 
             return;
         }
 
-        $user = User::where('stripe_id', $stripeId)->first();
+        // Para checkout.session.completed
+        $priceId = $object['metadata']['price_id']
+            ?? $object['lines']['data'][0]['price']['id']
+            ?? null;
 
-        if ($user) {
-            $role = $this->getRoleFromPriceId($priceId);
-            $user->syncRoles([$role]);
-            Log::info("Role '{$role}' sincronizada para o usuário: {$user->email}");
+        if (! $priceId) {
+            Log::warning("Price ID missing for Stripe Customer: {$stripeId}");
+
+            return;
         }
+
+        $role = $this->getRoleFromPriceId($priceId);
+        $user->syncRoles([$role]);
+
+        Log::info('User subscription synced', ['email' => $user->email, 'role' => $role]);
     }
 
     /**
-     * Lógica de limpeza quando a assinatura é cancelada.
+     * Gerencia a limpeza quando a assinatura é encerrada.
      */
     private function handleSubscriptionDeleted(array $payload): void
     {
-        $stripeId = $payload['data']['object']['customer'];
-        $user = User::where('stripe_id', $stripeId)->first();
+        $stripeId = $payload['data']['object']['customer'] ?? null;
 
-        if ($user) {
-            $user->syncRoles(['free']); // Retorna ao plano básico
-            Log::info("Usuário {$user->email} voltou para o plano free (assinatura deletada).");
+        if ($user = $this->findUser($stripeId)) {
+            $user->syncRoles(['free']);
+            Log::info('User downgraded to free', ['email' => $user->email]);
         }
     }
 
     /**
-     * Mapeamento centralizado de IDs de Preço para Roles.
-     */
-    private function getRoleFromPriceId(string $priceId): string
-    {
-        $mapping = [
-            config('plans.plans.pro.price_id') => 'pro',
-            config('plans.plans.enterprise.price_id') => 'enterprise',
-        ];
-
-        return $mapping[$priceId] ?? 'free';
-    }
-
-    /**
-     * Confirma que o pagamento de uma fatura foi realizado com sucesso.
-     * Ideal para renovar o acesso ou liberar pedidos.
+     * Processa o sucesso do pagamento e logs de auditoria.
      */
     private function handlePaymentSuccess(array $payload): void
     {
         $object = $payload['data']['object'];
-        $stripeId = $object['customer'];
-        $invoiceUrl = null;
-        if (isset($object['hosted_invoice_url'])) {
-            $invoiceUrl = $object['hosted_invoice_url']; // Link da fatura em PDF
-        }
+        $stripeId = $object['customer'] ?? null;
 
-        // Log do objeto completo para depuração
-        Log::info('Payment data received', ['object' => $object, 'stripeId' => $stripeId]);
-
-        $user = User::where('stripe_id', $stripeId)->first();
-
-        if (!$user) {
-            Log::error("Stripe Webhook: Pagamento recebido, mas usuário não encontrado. Stripe ID: {$stripeId}");
+        if (! $user = $this->findUser($stripeId)) {
             return;
         }
 
-        // 1. Log do sucesso para auditoria
-        Log::info("Pagamento confirmado para o usuário: {$user->email}. Fatura: {$invoiceUrl}");
+        // Auditoria de pagamento
+        Log::channel('stripe_webhooks_success')->info('Payment confirmed', [
+            'email' => $user->email,
+            'invoice' => $object['hosted_invoice_url'] ?? 'N/A',
+        ]);
 
-        // 2. Opcional: Atualizar a data de expiração ou status no seu banco
-        // $user->update(['ends_at' => null, 'last_payment_at' => now()]);
+        // Sincroniza a role para garantir consistência após o pagamento
+        $this->syncUserSubscription($payload);
+    }
 
-        // 3. Opcional: Notificar o usuário via Email/Notificação
-        // $user->notify(new PaymentReceivedNotification($invoiceUrl));
-        
-        // 4. Se for a primeira compra, o syncRoles já deve ter ocorrido no 'subscription.created',
-        // mas é uma boa prática garantir que ele tenha a role aqui também.
-        if (isset($object['lines']['data'][0]['price']['id'])) {
-            $role = $this->getRoleFromPriceId($object['lines']['data'][0]['price']['id']);
-            $user->syncRoles([$role]);
+    /**
+     * Busca o usuário com base no Stripe ID.
+     */
+    private function findUser(?string $stripeId): ?User
+    {
+        if (! $stripeId) {
+            return null;
         }
+
+        $user = User::query()->where('stripe_id', $stripeId)->first();
+
+        if (! $user) {
+            Log::error("Stripe Webhook: User not found for Stripe ID: {$stripeId}");
+        }
+
+        return $user;
+    }
+
+    /**
+     * Mapeamento de IDs de Preço para Roles usando match.
+     */
+    private function getRoleFromPriceId(string $priceId): string
+    {
+        return match ($priceId) {
+            config('plans.plans.pro.price_id_monthly'),
+            config('plans.plans.pro.price_id_yearly'),
+            config('plans.plans.pro.price_id') => 'pro',
+
+            config('plans.plans.enterprise.price_id_monthly'),
+            config('plans.plans.enterprise.price_id_yearly'),
+            config('plans.plans.enterprise.price_id') => 'enterprise',
+
+            default => 'free',
+        };
     }
 }

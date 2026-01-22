@@ -13,13 +13,22 @@ export function PricingPage({
     const { auth } = usePage<SharedData>().props;
     const [isAnnual, setIsAnnual] = useState(false);
 
-    const handlePlanClick = (planName: string, price_id: string) => {
+    const resolvePrice = (plan: PlansMap[keyof PlansMap], annual: boolean): number => {
+        const monthly = plan.monthlyPrice ?? plan.price ?? 0;
+        const yearly = plan.yearlyPrice ?? monthly;
+
+        return annual ? yearly : monthly;
+    };
+
+    const handlePlanClick = (planName: string) => {
         if (planName === "free" || !auth.user) {
             router.visit("/login");
             return;
         }
 
-        router.visit(payment.checkout({ plan: planName, billing: isAnnual ? 'annual' : 'monthly', price_id: price_id }));
+        // Usa window.location para permitir redirect externo do Stripe
+        const url = payment.checkout.url({ plan: planName, billing: isAnnual ? 'annual' : 'monthly' });
+        window.location.href = url;
     };
 
     return (
@@ -44,24 +53,24 @@ export function PricingPage({
                     <div className="animate-fade-in [animation-delay:100ms]">
                         <PricingCard
                             {...plans.free}
-                            price={0}
-                            onButtonClick={() => handlePlanClick("free", plans.free.price_id)}
+                            price={resolvePrice(plans.free, isAnnual)}
+                            onButtonClick={() => handlePlanClick("free")}
                             roles={auth.roles}
                         />
                     </div>
                     <div className="animate-fade-in [animation-delay:200ms] md:-mt-4 md:mb-4">
                         <PricingCard
                             {...plans.pro}
-                            price={isAnnual ? plans.pro.yearlyPrice : plans.pro.monthlyPrice}
-                            onButtonClick={() => handlePlanClick("pro", plans.pro.price_id)}
+                            price={resolvePrice(plans.pro, isAnnual)}
+                            onButtonClick={() => handlePlanClick("pro")}
                             roles={auth.roles}
                         />
                     </div>
                     <div className="animate-fade-in [animation-delay:300ms]">
                         <PricingCard
                             {...plans.enterprise}
-                            price={isAnnual ? plans.enterprise.yearlyPrice : plans.enterprise.monthlyPrice}
-                            onButtonClick={() => handlePlanClick("enterprise", plans.enterprise.price_id)}
+                            price={resolvePrice(plans.enterprise, isAnnual)}
+                            onButtonClick={() => handlePlanClick("enterprise")}
                             roles={auth.roles}
                         />
                     </div>

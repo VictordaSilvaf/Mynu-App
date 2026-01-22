@@ -118,29 +118,29 @@ export type Payment = {
 export type BillingInterval = 'month' | 'year';
 export type Currency = 'BRL';
 
-export interface Feature {
-  text: string;
-  icon?: "check" | "sparkles" | "chart" | "users" | "headphones" | "layers" | "qr" | "image" | "palette";
-}
+export type FeatureIcon = "check" | "sparkles" | "chart" | "users" | "headphones" | "layers" | "qr" | "image" | "palette";
+
+export type Feature = { text: string; icon?: FeatureIcon } | string;
 
 export interface Plan {
   isPopular?: boolean;
   name: string;
-  description: string;
-  price_id: string;
+  description?: string;
+  price_id: string | null;
 
-  monthlyPrice: number;
-  yearlyPrice: number;
+  monthlyPrice?: number;
+  yearlyPrice?: number;
+  price?: number;
 
   currency: Currency;
   interval: BillingInterval;
 
   features: Feature[];
 
-  isFree: boolean;
+  isFree?: boolean;
 
   priceNote?: string;
-  buttonText: string;
+  buttonText?: string;
   buttonLink?: string;
 }
 

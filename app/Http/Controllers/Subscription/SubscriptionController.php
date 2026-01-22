@@ -28,17 +28,63 @@ class SubscriptionController extends Controller
     {
         $user = $request->user();
 
-        dd([
-            'subscriptions' => $this->subscriptionService->getAllSubscriptions($user),
-            'subscription_status' => $this->subscriptionService->getSubscriptionStatus($user),
-            'has_payment_method' => $user->hasDefaultPaymentMethod(),
-            'roles' => $user->getRoleNames(),
-        ]);
-
         return Inertia::render('subscription/index', [
             'subscriptions' => $this->subscriptionService->getAllSubscriptions($user),
             'subscription_status' => $this->subscriptionService->getSubscriptionStatus($user),
             'has_payment_method' => $user->hasDefaultPaymentMethod(),
+        ]);
+    }
+
+    /**
+     * Display detailed subscription management page.
+     */
+    public function manage(Request $request): Response
+    {
+        $user = $request->user();
+        $subscription = $user->subscription('default');
+        $plans = config('plans.plans');
+
+        // Get current plan
+        $currentPlan = null;
+        $currentPlanKey = null;
+        if ($subscription) {
+            $priceId = $subscription->stripe_price;
+            foreach ($plans as $key => $plan) {
+                $monthlyMatch = isset($plan['price_id_monthly']) && $plan['price_id_monthly'] === $priceId;
+                $yearlyMatch = isset($plan['price_id_yearly']) && $plan['price_id_yearly'] === $priceId;
+                $defaultMatch = isset($plan['price_id']) && $plan['price_id'] === $priceId;
+
+                if ($monthlyMatch || $yearlyMatch || $defaultMatch) {
+                    $currentPlan = $plan;
+                    $currentPlanKey = $key;
+                    break;
+                }
+            }
+        }
+
+        // Get available plans (excluding current)
+        $availablePlans = array_filter($plans, function ($plan, $key) use ($currentPlanKey) {
+            return $key !== $currentPlanKey && ! ($plan['isFree'] ?? false);
+        }, ARRAY_FILTER_USE_BOTH);
+
+        // Get invoices
+        $invoices = $user->invoices()->map(function ($invoice) {
+            return [
+                'id' => $invoice->id,
+                'date' => $invoice->date()->toIso8601String(),
+                'amount' => (int) $invoice->total() / 100,
+                'status' => $invoice->status,
+                'invoice_pdf' => $invoice->invoice_pdf ?? null,
+            ];
+        })->take(10)->toArray();
+
+        return Inertia::render('subscription/manage', [
+            'subscription' => $subscription,
+            'subscription_status' => $this->subscriptionService->getSubscriptionStatus($user),
+            'current_plan' => $currentPlan,
+            'available_plans' => $availablePlans,
+            'has_payment_method' => $user->hasDefaultPaymentMethod(),
+            'invoices' => $invoices,
         ]);
     }
 
