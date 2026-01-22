@@ -103,22 +103,22 @@ class CheckoutController extends Controller
     public function success(Request $request): Response
     {
         $user = $request->user();
-        $subscription = null;
 
-        if ($user && $user->subscribed('default')) {
-            $sub = $user->subscription('default');
-            $subscription = [
-                'id' => $sub->stripe_id,
-                'plan' => $sub->stripe_price ?? 'unknown',
-                'status' => $sub->stripe_status,
-                'current_period_end' => $sub->ends_at?->toIso8601String(),
-            ];
-        }
+        // Se ainda não tem assinatura no banco, passamos um estado de 'pending'
+        $sub = $user->subscription('default');
+
+        $subscriptionData = $sub ? [
+            'id' => $sub->stripe_id,
+            'plan' => $sub->stripe_price,
+            'status' => $sub->stripe_status,
+            'current_period_end' => $sub->ends_at?->toIso8601String(),
+        ] : null;
 
         return Inertia::render('payment/success', [
             'plan' => $request->query('plan'),
             'billing' => $request->query('billing'),
-            'subscription' => $subscription,
+            'subscription' => $subscriptionData,
+            'is_processing' => is_null($subscriptionData), // Nova prop para o React
         ]);
     }
 

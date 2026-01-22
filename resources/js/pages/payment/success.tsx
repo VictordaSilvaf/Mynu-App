@@ -1,12 +1,13 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { dashboard, monthlyfee } from '@/routes';
+import { dashboard } from '@/routes';
 import { Head, Link, router } from '@inertiajs/react';
 import { CheckCircle2, ArrowRight, Receipt, CreditCard, AlertCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useStripe } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
+import { index as subscriptionIndex } from '@/routes/subscription';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY || '');
 
@@ -103,7 +104,7 @@ function PaymentSuccessContent({ plan, billing, subscription }: PaymentSuccessPr
                             <p className="mb-6 text-muted-foreground">{error}</p>
 
                             <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-                                <Button onClick={() => router.visit(monthlyfee().url)} size="lg">
+                                <Button onClick={() => router.visit(subscriptionIndex().url)} size="lg">
                                     Tentar Novamente
                                 </Button>
                                 <Button variant="outline" onClick={() => router.visit(dashboard().url)} size="lg">
@@ -233,7 +234,7 @@ function PaymentSuccessContent({ plan, billing, subscription }: PaymentSuccessPr
                                     Ir para Dashboard
                                     <ArrowRight className="size-4" />
                                 </Button>
-                                <Button variant="outline" onClick={() => router.visit(monthlyfee().url)} size="lg">
+                                <Button variant="outline" onClick={() => router.visit(subscriptionIndex().url)} size="lg">
                                     <CreditCard className="size-4" />
                                     Gerenciar Assinatura
                                 </Button>

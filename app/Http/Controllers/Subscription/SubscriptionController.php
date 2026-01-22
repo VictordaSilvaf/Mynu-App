@@ -28,6 +28,13 @@ class SubscriptionController extends Controller
     {
         $user = $request->user();
 
+        dd([
+            'subscriptions' => $this->subscriptionService->getAllSubscriptions($user),
+            'subscription_status' => $this->subscriptionService->getSubscriptionStatus($user),
+            'has_payment_method' => $user->hasDefaultPaymentMethod(),
+            'roles' => $user->getRoleNames(),
+        ]);
+
         return Inertia::render('subscription/index', [
             'subscriptions' => $this->subscriptionService->getAllSubscriptions($user),
             'subscription_status' => $this->subscriptionService->getSubscriptionStatus($user),

@@ -5,8 +5,9 @@ import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-
 import { loadStripe, type Appearance } from '@stripe/stripe-js';
 import { AlertCircle, CheckCircle2, CreditCard, Lock, Shield } from 'lucide-react';
 import { useMemo, useState, type FormEvent } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { CheckoutProvider } from '@stripe/react-stripe-js/checkout';
+import { SharedData } from '@/types';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY || '');
 
@@ -20,11 +21,13 @@ interface PaymentProps {
 }
 
 function CheckoutForm({ plan, billing, amount, currency }: Omit<PaymentProps, 'clientSecret' | 'price_id'>) {
+    const { auth } = usePage<SharedData>().props;
+
     const stripe = useStripe();
     const elements = useElements();
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [email, setEmail] = useState('');
+    const [email, setEmail] = useState(auth.user?.email || '');
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();

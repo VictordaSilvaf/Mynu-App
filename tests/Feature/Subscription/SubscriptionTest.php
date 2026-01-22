@@ -1,12 +1,9 @@
 <?php
 
 use App\Models\User;
-use Laravel\Cashier\Cashier;
-use Stripe\Customer;
+use Tests\TestCase;
 
-beforeEach(function () {
-    Cashier::useCustomerModel(Customer::class);
-});
+/** @var TestCase $this */
 
 test('a página de assinatura é exibida', function () {
     $user = User::factory()->create();

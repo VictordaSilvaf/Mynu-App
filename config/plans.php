@@ -13,7 +13,7 @@ return [
 
     'plans' => [
         'free' => [
-            'name' => 'Free',
+            'name' => 'free',
             'description' => 'Comece gratuitamente',
             'price_id' => env('STRIPE_PRICE_FREE', ''),
             'monthlyPrice' => 0,
@@ -33,7 +33,7 @@ return [
 
         'pro' => [
             'isPopular' => true,
-            'name' => 'Pro',
+            'name' => 'pro',
             'description' => 'Ideal para negócios em crescimento',
             'price_id' => env('STRIPE_PRICE_PRO', 'price_pro'),
             'monthlyPrice' => 29.90,
@@ -53,7 +53,7 @@ return [
         ],
 
         'enterprise' => [
-            'name' => 'Enterprise',
+            'name' => 'enterprise',
             'description' => 'Para grandes operações',
             'price_id' => env('STRIPE_PRICE_ENTERPRISE', 'price_enterprise'),
             'monthlyPrice' => 99.90,

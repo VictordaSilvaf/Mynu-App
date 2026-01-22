@@ -18,6 +18,10 @@ require __DIR__.'/marketing.php';
 // Payment Routes
 require __DIR__.'/payment.php';
 
+// Subscription Routes
+require __DIR__.'/subscription.php';
+
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
@@ -28,13 +32,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return Inertia::render('menus');
         })->name('menus');
     });
-
-    Route::get('monthlyfee', function () {
-        return Inertia::render('monthlyfee', [
-            'plans' => config('plans')['plans'],
-        ]);
-    })->name('monthlyfee');
 });
 
 require __DIR__.'/settings.php';
-require __DIR__.'/subscription.php';
