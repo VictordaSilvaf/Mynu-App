@@ -1,8 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { dashboard, monthlyfee } from '@/routes';
+import { dashboard } from '@/routes';
 import { Head, router } from '@inertiajs/react';
 import { XCircle, AlertCircle, ArrowLeft, Mail } from 'lucide-react';
+import { index } from '@/routes/subscription';
 
 interface PaymentCancelledProps {
     reason?: string;
@@ -127,7 +128,7 @@ export default function PaymentCancelled({ reason, plan, billing }: PaymentCance
                                             if (plan && billing) {
                                                 window.history.back();
                                             } else {
-                                                router.visit(monthlyfee().url);
+                                                router.visit(index().url);
                                             }
                                         }}
                                         size="lg"
