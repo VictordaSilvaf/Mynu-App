@@ -67,9 +67,9 @@ export function DataTable<TData, TValue>({
                         }
                         className="h-8 w-[150px] lg:w-[250px]"
                     />
-                    {table.getColumn("isActive") && (
+                    {table.getColumn("is_active") && (
                         <DataTableFacetedFilter
-                            column={table.getColumn("isActive")}
+                            column={table.getColumn("is_active")}
                             title="Status"
                             options={statuses}
                         />

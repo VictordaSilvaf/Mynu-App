@@ -2,14 +2,14 @@ import MenuModal from '@/components/menu-modal';
 import { columns } from '@/components/menuTable/columns';
 import { DataTable } from '@/components/menuTable/data-table';
 import AppLayout from '@/layouts/app-layout';
-import menus from '@/routes/menus';
+import { index as menusIndex } from '@/routes/menus';
 import { PageProps, Menu, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Menu',
-        href: menus.index().url,
+        href: menusIndex().url,
     },
 ];
 

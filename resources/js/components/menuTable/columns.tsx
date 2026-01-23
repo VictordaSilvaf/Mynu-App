@@ -1,7 +1,8 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { MoreHorizontal } from "lucide-react"
+import { Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
+import { router } from "@inertiajs/react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -15,6 +16,7 @@ import {
 import { Menu } from "@/types"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { Badge } from "@/components/ui/badge"
+import { index as menusIndex, show as menusShow, destroy as menusDestroy } from "@/routes/menus"
 
 export const columns: ColumnDef<Menu>[] = [
     {
@@ -22,14 +24,25 @@ export const columns: ColumnDef<Menu>[] = [
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Nome" />
         ),
+        cell: ({ row }) => {
+            const menu = row.original
+            return (
+                <button
+                    onClick={() => router.visit(menusShow(menu.id).url)}
+                    className="text-left font-medium hover:underline"
+                >
+                    {menu.name}
+                </button>
+            )
+        },
     },
     {
-        accessorKey: "isActive",
+        accessorKey: "is_active",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Status" />
         ),
         cell: ({ row }) => {
-            const isActive = row.getValue("isActive")
+            const isActive = row.original.is_active
 
             return (
                 <Badge variant={isActive ? "default" : "outline"}>
@@ -38,7 +51,7 @@ export const columns: ColumnDef<Menu>[] = [
             )
         },
         filterFn: (row, id, value) => {
-            return value.includes(row.getValue(id))
+            return value.includes(row.original.is_active)
         },
     },
     {
@@ -50,7 +63,7 @@ export const columns: ColumnDef<Menu>[] = [
     {
         id: "actions",
         cell: ({ row }) => {
-            const payment = row.original
+            const menu = row.original
 
             return (
                 <DropdownMenu>
@@ -63,13 +76,23 @@ export const columns: ColumnDef<Menu>[] = [
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Ações</DropdownMenuLabel>
                         <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(payment.id)}
+                            onClick={() => router.visit(menusShow(menu.id).url)}
                         >
-                            Copiar ID do pagamento
+                            <Eye className="mr-2 h-4 w-4" />
+                            Ver detalhes
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>Ver cliente</DropdownMenuItem>
-                        <DropdownMenuItem>Ver detalhes do pagamento</DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => {
+                                if (confirm('Tem certeza que deseja excluir este cardápio?')) {
+                                    router.delete(menusDestroy(menu.id).url)
+                                }
+                            }}
+                            className="text-destructive"
+                        >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Excluir
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             )
