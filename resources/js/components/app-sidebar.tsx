@@ -11,11 +11,12 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard, home, menus } from '@/routes';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { ClipboardList, HouseIcon, LayoutGrid, Sparkle } from 'lucide-react';
+import { type NavItem, SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { ClipboardList, HouseIcon, LayoutGrid, Sparkle, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 import { index as subscriptionIndex } from '@/routes/subscription';
+import { index as userIndex } from '@/routes/admin/admin/users';
 
 const mainNavItems: NavItem[] = [
     {
@@ -35,6 +36,14 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
+const adminNavItems: NavItem[] = [
+    {
+        title: 'User Management',
+        href: userIndex(),
+        icon: Users,
+    },
+]
+
 const footerNavItems: NavItem[] = [
     {
         title: 'MYNU',
@@ -44,6 +53,9 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const { auth } = usePage<SharedData>().props
+    const userRoles = auth.user.roles?.map(role => role.name) || []
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -60,6 +72,7 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={mainNavItems} />
+                {userRoles.includes('admin') && <NavMain items={adminNavItems} title="Admin" />}
             </SidebarContent>
 
             <SidebarFooter>

@@ -12,6 +12,9 @@ use Inertia\Inertia;
 |
 */
 
+// Admin Routes
+require __DIR__.'/admin.php';
+
 // Marketing & Public Routes
 require __DIR__.'/marketing.php';
 

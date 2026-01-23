@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
 class DatabaseSeeder extends Seeder
@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             'analytics_basico',
             'analytics_avancado',
             'gerenciar_menu',
+            'user.management',
         ];
 
         foreach ($permissions as $permission) {
@@ -51,6 +52,14 @@ class DatabaseSeeder extends Seeder
             ['name' => 'enterprise', 'guard_name' => 'web']
         );
 
+        $admin = Role::firstOrCreate(
+            ['name' => 'admin', 'guard_name' => 'web']
+        );
+
+        Role::firstOrCreate(
+            ['name' => 'user', 'guard_name' => 'web']
+        );
+
         /*
         |--------------------------------------------------------------------------
         | Atribuição de permissions por plano
@@ -67,6 +76,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $enterprise->syncPermissions(Permission::all());
+        $admin->syncPermissions(Permission::all());
 
         /*
         |--------------------------------------------------------------------------
@@ -75,19 +85,24 @@ class DatabaseSeeder extends Seeder
         */
         $users = [
             [
-                'email' => 'free@mynu.com',
+                'email' => 'free@mynu.com.br',
                 'name' => 'Free User',
                 'role' => 'free',
             ],
             [
-                'email' => 'pro@mynu.com',
+                'email' => 'pro@mynu.com.br',
                 'name' => 'Pro User',
                 'role' => 'pro',
             ],
             [
-                'email' => 'enterprise@mynu.com',
+                'email' => 'enterprise@mynu.com.br',
                 'name' => 'Enterprise User',
                 'role' => 'enterprise',
+            ],
+            [
+                'email' => 'admin@mynu.com.br',
+                'name' => 'Admin User',
+                'role' => 'admin',
             ],
         ];
 

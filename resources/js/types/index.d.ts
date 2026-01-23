@@ -40,6 +40,10 @@ export interface User {
   two_factor_enabled?: boolean;
   created_at: string;
   updated_at: string;
+  roles?: {
+    id: number;
+    name: string;
+  }[];
   [key: string]: unknown; // This allows for additional properties...
 }
 
@@ -147,3 +151,10 @@ export interface Plan {
 export type PlanKey = 'free' | 'pro' | 'enterprise';
 
 export type PlansMap = Record<PlanKey, Plan>;
+
+export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
+    auth: {
+        user: User;
+    };
+};
+
