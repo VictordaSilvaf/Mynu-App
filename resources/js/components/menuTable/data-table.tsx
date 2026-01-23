@@ -2,9 +2,13 @@
 
 import {
     ColumnDef,
+    ColumnFiltersState,
+    SortingState,
     flexRender,
     getCoreRowModel,
+    getFilteredRowModel,
     getPaginationRowModel,
+    getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table"
 
@@ -17,6 +21,10 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Button } from "../ui/button"
+import React from "react"
+import { Input } from "../ui/input"
+import { DataTableFacetedFilter } from "./data-table-faceted-filter"
+import { statuses } from "./data"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -27,15 +35,56 @@ export function DataTable<TData, TValue>({
     columns,
     data,
 }: DataTableProps<TData, TValue>) {
+    const [sorting, setSorting] = React.useState<SortingState>([])
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+
     const table = useReactTable({
         data,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
+        onSortingChange: setSorting,
+        getSortedRowModel: getSortedRowModel(),
+        onColumnFiltersChange: setColumnFilters,
+        getFilteredRowModel: getFilteredRowModel(),
+        state: {
+            sorting,
+            columnFilters,
+        }
     })
+
+    const isFiltered = table.getState().columnFilters.length > 0
 
     return (
         <div className="">
+            <div className="flex items-center justify-between">
+                <div className="flex flex-1 items-center space-x-2">
+                    <Input
+                        placeholder="Filtrar cardápios..."
+                        value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+                        onChange={(event) =>
+                            table.getColumn("name")?.setFilterValue(event.target.value)
+                        }
+                        className="h-8 w-[150px] lg:w-[250px]"
+                    />
+                    {table.getColumn("isActive") && (
+                        <DataTableFacetedFilter
+                            column={table.getColumn("isActive")}
+                            title="Status"
+                            options={statuses}
+                        />
+                    )}
+                    {isFiltered && (
+                        <Button
+                            variant="ghost"
+                            onClick={() => table.resetColumnFilters()}
+                            className="h-8 px-2 lg:px-3"
+                        >
+                            Reset
+                        </Button>
+                    )}
+                </div>
+            </div>
             <div className="overflow-hidden rounded-md border">
                 <Table>
                     <TableHeader>
