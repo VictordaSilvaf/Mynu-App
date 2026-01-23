@@ -10,13 +10,14 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard, home, menus } from '@/routes';
+import { dashboard, home } from '@/routes';
 import { type NavItem, SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ClipboardList, HouseIcon, LayoutGrid, Sparkle, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 import { index as subscriptionIndex } from '@/routes/subscription';
 import { index as userIndex } from '@/routes/admin/admin/users';
+import { index as menusIndex} from '@/routes/menus';
 
 const mainNavItems: NavItem[] = [
     {
@@ -26,7 +27,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Meus Cardápios',
-        href: menus(),
+        href: menusIndex(),
         icon: ClipboardList,
     },
     {

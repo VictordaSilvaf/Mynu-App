@@ -76,15 +76,42 @@ export type MenuCategory = {
 }
 
 export type Menu = {
-  id: string
+  id: number
   name: string
-  isActive: boolean
+  is_active: boolean
+  user_id: number
+  created_at: string
+  updated_at: string
 
+  sections?: Section[]
   categories?: MenuCategory[]
-  items: number
+  items?: number
+}
 
-  createdAt: string
-  updatedAt: string
+export type Section = {
+  id: number
+  menu_id: number
+  name: string
+  description?: string
+  order: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+  dishes?: Dish[]
+}
+
+export type Dish = {
+  id: number
+  section_id: number
+  name: string
+  description?: string
+  price: number
+  image?: string
+  order: number
+  is_active: boolean
+  is_available: boolean
+  created_at: string
+  updated_at: string
 }
 
 export type OrderItem = {

@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\DishController;
+use App\Http\Controllers\MenuController;
+use App\Http\Controllers\SectionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -24,16 +27,21 @@ require __DIR__.'/payment.php';
 // Subscription Routes
 require __DIR__.'/subscription.php';
 
-
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
+    Route::resource('menus', MenuController::class)->middleware(['role:pro|enterprise'])->names([
+        'index' => 'menus.index',
+        'store' => 'menus.store',
+        'show' => 'menus.show',
+        'update' => 'menus.update',
+    ]);
+
     Route::middleware(['role:pro|enterprise'])->group(function () {
-        Route::get('menus', function () {
-            return Inertia::render('menus');
-        })->name('menus');
+        Route::resource('sections', SectionController::class)->only(['store', 'update', 'destroy']);
+        Route::resource('dishes', DishController::class)->only(['store', 'update', 'destroy']);
     });
 });
 

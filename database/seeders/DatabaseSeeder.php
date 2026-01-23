@@ -119,5 +119,96 @@ class DatabaseSeeder extends Seeder
             // garante apenas um plano ativo
             $user->syncRoles([$data['role']]);
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Menus de teste (apenas para pro e enterprise)
+        |--------------------------------------------------------------------------
+        */
+        $proUser = User::where('email', 'pro@mynu.com.br')->first();
+        if ($proUser) {
+            $menu = $proUser->menus()->create([
+                'name' => 'Cardápio Italiano',
+                'is_active' => true,
+            ]);
+
+            // Seção: Entradas
+            $entradasSection = $menu->sections()->create([
+                'name' => 'Entradas',
+                'description' => 'Deliciosas opções para começar sua refeição',
+                'order' => 1,
+                'is_active' => true,
+            ]);
+
+            $entradasSection->dishes()->create([
+                'name' => 'Bruschetta Italiana',
+                'description' => 'Pão italiano tostado com tomate fresco, manjericão e azeite extra virgem',
+                'price' => 28.90,
+                'order' => 1,
+                'is_active' => true,
+                'is_available' => true,
+            ]);
+
+            $entradasSection->dishes()->create([
+                'name' => 'Carpaccio de Salmão',
+                'description' => 'Salmão fresco em fatias finas com alcaparras e molho de mostarda',
+                'price' => 42.90,
+                'order' => 2,
+                'is_active' => true,
+                'is_available' => true,
+            ]);
+
+            // Seção: Massas
+            $massasSection = $menu->sections()->create([
+                'name' => 'Massas',
+                'description' => 'Massas artesanais com molhos tradicionais',
+                'order' => 2,
+                'is_active' => true,
+            ]);
+
+            $massasSection->dishes()->create([
+                'name' => 'Spaghetti Carbonara',
+                'description' => 'Massa fresca com bacon, ovos, queijo pecorino e pimenta do reino',
+                'price' => 58.90,
+                'order' => 1,
+                'is_active' => true,
+                'is_available' => true,
+            ]);
+
+            $massasSection->dishes()->create([
+                'name' => 'Ravioli de Funghi',
+                'description' => 'Ravioli recheado com cogumelos ao molho de manteiga e sálvia',
+                'price' => 62.90,
+                'order' => 2,
+                'is_active' => true,
+                'is_available' => true,
+            ]);
+
+            // Seção: Sobremesas
+            $sobremesasSection = $menu->sections()->create([
+                'name' => 'Sobremesas',
+                'description' => 'Doces tradicionais italianos',
+                'order' => 3,
+                'is_active' => true,
+            ]);
+
+            $sobremesasSection->dishes()->create([
+                'name' => 'Tiramisù',
+                'description' => 'Clássica sobremesa italiana com café e mascarpone',
+                'price' => 32.90,
+                'order' => 1,
+                'is_active' => true,
+                'is_available' => true,
+            ]);
+
+            $sobremesasSection->dishes()->create([
+                'name' => 'Panna Cotta',
+                'description' => 'Creme italiano com calda de frutas vermelhas',
+                'price' => 28.90,
+                'order' => 2,
+                'is_active' => true,
+                'is_available' => true,
+            ]);
+        }
     }
 }

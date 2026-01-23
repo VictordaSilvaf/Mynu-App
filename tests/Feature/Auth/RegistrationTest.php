@@ -29,5 +29,3 @@ test('new users can register', function () {
 
     $response->assertRedirect(route('dashboard', absolute: false));
 });
-
-
