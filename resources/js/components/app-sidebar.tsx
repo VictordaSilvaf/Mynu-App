@@ -79,7 +79,7 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={mainNavItems} />
-                {userRoles.includes('admin') && <NavMain items={adminNavItems} title="Admin" />}
+                {userRoles.includes('admin') && <NavMain items={adminNavItems} title="Administração" />}
             </SidebarContent>
 
             <SidebarFooter>

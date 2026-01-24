@@ -12,8 +12,8 @@ import { Link, usePage } from '@inertiajs/react';
 export function NavMain({ items = [], title }: { items: NavItem[], title?: string }) {
     const page = usePage();
     return (
-        <SidebarGroup className="px-2 py-0">
-            <SidebarGroupLabel>{title ?? 'Platform'}</SidebarGroupLabel>
+        <SidebarGroup className="py-0">
+            {title && <SidebarGroupLabel>{title}</SidebarGroupLabel>}
             <SidebarMenu>
                 {items.map((item) => (
                     <SidebarMenuItem key={item.title}>
