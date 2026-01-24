@@ -185,3 +185,26 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
     };
 };
 
+export type OperatingHours = {
+    [key in 'seg' | 'ter' | 'qua' | 'qui' | 'sex' | 'sab' | 'dom']?: {
+        isOpen: boolean;
+        open: string;
+        close: string;
+    };
+};
+
+export interface Store {
+    id: number;
+    user_id: number;
+    name: string;
+    phones: string[];
+    colors: string[];
+    operating_hours: OperatingHours;
+    whatsapp: string;
+    instagram: string;
+    document_type: 'cpf' | 'cnpj' | null;
+    document_number: string;
+    created_at: string;
+    updated_at: string;
+}
+

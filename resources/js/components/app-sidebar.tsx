@@ -18,12 +18,18 @@ import AppLogo from './app-logo';
 import { index as subscriptionIndex } from '@/routes/subscription';
 import { index as userIndex } from '@/routes/admin/admin/users';
 import { index as menusIndex} from '@/routes/menus';
+import { index as storeIndex} from '@/routes/stores';
 
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Minha Loja',
+        href: storeIndex(),
+        icon: HouseIcon,
     },
     {
         title: 'Meus Cardápios',

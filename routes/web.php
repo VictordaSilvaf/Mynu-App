@@ -3,6 +3,7 @@
 use App\Http\Controllers\DishController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\SectionController;
+use App\Http\Controllers\StoreController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -38,6 +39,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         'show' => 'menus.show',
         'update' => 'menus.update',
     ]);
+
+    Route::resource('stores', StoreController::class)->only(['index', 'store', 'update']);
 
     Route::middleware(['role:pro|enterprise'])->group(function () {
         Route::resource('sections', SectionController::class)->only(['store', 'update', 'destroy']);

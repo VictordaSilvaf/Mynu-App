@@ -14,20 +14,32 @@ class MenuController extends Controller
 
     public function index(Request $request)
     {
-        $menus = $request->user()->menus()->latest()->get();
+        if (! $request->user()->store) {
+            return Inertia::render('menus', [
+                'menus' => [],
+                'hasStore' => false,
+            ]);
+        }
+
+        $menus = $request->user()->store->menus()->latest()->get();
 
         return Inertia::render('menus', [
             'menus' => $menus,
+            'hasStore' => true,
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
+        if (! $request->user()->store) {
+            return redirect()->route('stores.index');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
         ]);
 
-        $request->user()->menus()->create($validated);
+        $request->user()->store->menus()->create($validated);
 
         return redirect()->route('menus.index');
     }

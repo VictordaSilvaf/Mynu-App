@@ -13,7 +13,7 @@ class Menu extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
+        'store_id',
         'name',
         'is_active',
     ];
@@ -22,9 +22,9 @@ class Menu extends Model
         'is_active' => 'boolean',
     ];
 
-    public function user(): BelongsTo
+    public function store(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Store::class);
     }
 
     public function sections(): HasMany

@@ -2,7 +2,9 @@ import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
+import { Button } from '@/components/ui/button';
+import { manage } from '@/routes/subscription';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
