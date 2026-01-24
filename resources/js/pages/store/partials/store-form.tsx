@@ -6,10 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Store } from '@/types';
 import { store as storeRoute, update } from '@/routes/stores';
-import { AtSign, Building, FileText, Instagram, Palette, Phone, PlusCircle, Trash2, Watch, Whatsapp } from 'lucide-react';
+import { AtSign, Building, FileText, Instagram, Palette, Phone, PlusCircle, Trash2 } from 'lucide-react';
 import InputError from '@/components/input-error';
 import OperatingHoursForm from './operating-hours-form';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import React from 'react';
+import { useMaskInput } from 'use-mask-input';
+import { PhoneInput } from './phone-input';
 
 interface StoreFormProps {
     store: Store | null;
@@ -25,14 +28,21 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
         operating_hours: storeData?.operating_hours ?? {},
         whatsapp: storeData?.whatsapp ?? '',
         instagram: storeData?.instagram ?? '',
-        document_type: storeData?.document_type ?? null,
+        document_type: storeData?.document_type ?? 'cpf',
         document_number: storeData?.document_number ?? '',
     });
+
+    const whatsappRef = useMaskInput({ mask: '(99) 99999-9999' });
+    const documentRef = useMaskInput(
+        data.document_type === 'cpf'
+            ? { mask: '999.999.999-99' }
+            : { mask: '99.999.999/9999-99' },
+    );
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (storeData) {
-            patch(update({ id: storeData.id }).url);
+            patch(update({ store: storeData.id }).url);
         } else {
             post(storeRoute().url);
         }
@@ -79,7 +89,7 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
                             <div key={index} className="flex items-center gap-2">
                                 <div className="relative flex-1">
                                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                                    <Input value={phone} onChange={(e) => handleFieldChange('phones', index, e.target.value)} className="pl-9" placeholder="(99) 99999-9999" />
+                                    <PhoneInput value={phone} onChange={(e) => handleFieldChange('phones', index, e.target.value)} className="pl-9" placeholder="(99) 99999-9999" />
                                 </div>
                                 {data.phones.length > 1 && (
                                     <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveField('phones', index)}>
@@ -125,7 +135,14 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
                         <Label htmlFor="whatsapp">WhatsApp</Label>
                         <div className="relative">
                             <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                            <Input id="whatsapp" value={data.whatsapp} onChange={(e) => setData('whatsapp', e.target.value)} className="pl-9" placeholder="+55 (99) 99999-9999" />
+                            <Input
+                                id="whatsapp"
+                                ref={whatsappRef}
+                                value={data.whatsapp}
+                                onChange={(e) => setData('whatsapp', e.target.value)}
+                                className="pl-9"
+                                placeholder="+55 (99) 99999-9999"
+                            />
                         </div>
                         <InputError message={errors.whatsapp} />
                     </div>
@@ -154,6 +171,7 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
                         <div className="relative">
                             <FileText className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                             <Input
+                                ref={documentRef}
                                 value={data.document_number}
                                 onChange={(e) => setData('document_number', e.target.value)}
                                 className="pl-9"

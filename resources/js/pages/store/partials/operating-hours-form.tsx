@@ -1,9 +1,8 @@
 
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { OperatingHours } from '@/types';
-import { UseFormSetData } from '@inertiajs/react';
+import TimeInput from './time-input';
 
 type DayOfWeek = 'seg' | 'ter' | 'qua' | 'qui' | 'sex' | 'sab' | 'dom';
 
@@ -44,7 +43,7 @@ export default function OperatingHoursForm({ operatingHours, setData }: Operatin
         <div className="space-y-4">
             {daysOfWeek.map((day) => (
                 <div key={day.id} className="grid grid-cols-4 items-center gap-4">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 col-span-full md:col-span-1">
                         <Checkbox
                             id={`is_open_${day.id}`}
                             checked={operatingHours[day.id]?.isOpen ?? false}
@@ -54,14 +53,14 @@ export default function OperatingHoursForm({ operatingHours, setData }: Operatin
                             {day.name}
                         </Label>
                     </div>
-                    <Input
-                        type="time"
+                    <TimeInput
+                        label="Abertura"
                         value={operatingHours[day.id]?.open ?? ''}
                         onChange={(e) => handleTimeChange(day.id, 'open', e.target.value)}
                         disabled={!operatingHours[day.id]?.isOpen}
                     />
-                    <Input
-                        type="time"
+                    <TimeInput
+                        label="Fechamento"
                         value={operatingHours[day.id]?.close ?? ''}
                         onChange={(e) => handleTimeChange(day.id, 'close', e.target.value)}
                         disabled={!operatingHours[day.id]?.isOpen}
