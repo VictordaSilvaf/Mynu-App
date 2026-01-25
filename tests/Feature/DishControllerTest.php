@@ -3,6 +3,7 @@
 use App\Models\Dish;
 use App\Models\Menu;
 use App\Models\Section;
+use App\Models\Store;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -14,12 +15,14 @@ test('pro user can create a dish', function () {
 
     $user = User::factory()->create();
     $user->assignRole('pro');
+    $store = Store::factory()->for($user)->create();
 
-    $menu = Menu::factory()->create(['user_id' => $user->id]);
-    $section = Section::factory()->create(['menu_id' => $menu->id]);
+    $menu = Menu::factory()->for($store)->create();
+    $section = Section::factory()->for($menu)->create();
 
     $response = $this->actingAs($user)->post(route('dishes.store'), [
         'section_id' => $section->id,
+        'store_id' => $store->id,
         'name' => 'Risoto de Funghi',
         'description' => 'Delicioso risoto',
         'price' => 58.90,
@@ -42,10 +45,11 @@ test('pro user can update a dish', function () {
 
     $user = User::factory()->create();
     $user->assignRole('pro');
+    $store = Store::factory()->for($user)->create();
 
-    $menu = Menu::factory()->create(['user_id' => $user->id]);
-    $section = Section::factory()->create(['menu_id' => $menu->id]);
-    $dish = Dish::factory()->create(['section_id' => $section->id]);
+    $menu = Menu::factory()->for($store)->create();
+    $section = Section::factory()->for($menu)->create();
+    $dish = Dish::factory()->for($section)->create(['store_id' => $store->id]);
 
     $response = $this->actingAs($user)->post(route('dishes.update', $dish), [
         'name' => 'Risoto Updated',
@@ -65,10 +69,11 @@ test('pro user can delete a dish', function () {
 
     $user = User::factory()->create();
     $user->assignRole('pro');
+    $store = Store::factory()->for($user)->create();
 
-    $menu = Menu::factory()->create(['user_id' => $user->id]);
-    $section = Section::factory()->create(['menu_id' => $menu->id]);
-    $dish = Dish::factory()->create(['section_id' => $section->id]);
+    $menu = Menu::factory()->for($store)->create();
+    $section = Section::factory()->for($menu)->create();
+    $dish = Dish::factory()->for($section)->create(['store_id' => $store->id]);
 
     $response = $this->actingAs($user)->delete(route('dishes.destroy', $dish));
 

@@ -26,6 +26,8 @@ class DishController extends Controller
             $data['image'] = $request->file('image')->store('dishes', 'public');
         }
 
+        $data['store_id'] = $section->menu->store_id;
+
         $section->dishes()->create($data);
 
         return redirect()->back();
