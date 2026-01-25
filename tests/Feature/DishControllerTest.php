@@ -11,10 +11,10 @@ use Spatie\Permission\Models\Role;
 test('pro user can create a dish', function () {
     Storage::fake('public');
     Role::create(['name' => 'pro', 'guard_name' => 'web']);
-    
+
     $user = User::factory()->create();
     $user->assignRole('pro');
-    
+
     $menu = Menu::factory()->create(['user_id' => $user->id]);
     $section = Section::factory()->create(['menu_id' => $menu->id]);
 
@@ -39,10 +39,10 @@ test('pro user can create a dish', function () {
 
 test('pro user can update a dish', function () {
     Role::create(['name' => 'pro', 'guard_name' => 'web']);
-    
+
     $user = User::factory()->create();
     $user->assignRole('pro');
-    
+
     $menu = Menu::factory()->create(['user_id' => $user->id]);
     $section = Section::factory()->create(['menu_id' => $menu->id]);
     $dish = Dish::factory()->create(['section_id' => $section->id]);
@@ -62,10 +62,10 @@ test('pro user can update a dish', function () {
 
 test('pro user can delete a dish', function () {
     Role::create(['name' => 'pro', 'guard_name' => 'web']);
-    
+
     $user = User::factory()->create();
     $user->assignRole('pro');
-    
+
     $menu = Menu::factory()->create(['user_id' => $user->id]);
     $section = Section::factory()->create(['menu_id' => $menu->id]);
     $dish = Dish::factory()->create(['section_id' => $section->id]);

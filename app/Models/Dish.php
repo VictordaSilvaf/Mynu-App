@@ -12,6 +12,7 @@ class Dish extends Model
     use HasFactory;
 
     protected $fillable = [
+        'store_id',
         'section_id',
         'name',
         'description',
@@ -32,5 +33,10 @@ class Dish extends Model
     public function section(): BelongsTo
     {
         return $this->belongsTo(Section::class);
+    }
+
+    public function store(): BelongsTo
+    {
+        return $this->belongsTo(Store::class);
     }
 }

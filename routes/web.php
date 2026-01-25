@@ -1,11 +1,11 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DishController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\StoreController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,9 +29,7 @@ require __DIR__.'/payment.php';
 require __DIR__.'/subscription.php';
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
 
     Route::resource('menus', MenuController::class)->middleware(['role:pro|enterprise'])->names([
         'index' => 'menus.index',

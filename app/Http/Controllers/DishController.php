@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 class DishController extends Controller
 {
     use AuthorizesRequests;
+
     public function store(StoreDishRequest $request): RedirectResponse
     {
         $section = Section::findOrFail($request->section_id);

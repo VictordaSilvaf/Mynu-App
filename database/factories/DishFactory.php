@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Section;
+use App\Models\Store;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -29,6 +30,7 @@ class DishFactory extends Factory
         ];
 
         return [
+            'store_id' => Store::factory(),
             'section_id' => Section::factory(),
             'name' => $this->faker->randomElement($dishes),
             'description' => $this->faker->sentence(10),

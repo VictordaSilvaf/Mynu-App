@@ -38,4 +38,14 @@ class Store extends Model
     {
         return $this->hasMany(Menu::class);
     }
+
+    public function dishes(): HasMany
+    {
+        return $this->hasMany(Dish::class);
+    }
+
+    public function visits(): HasMany
+    {
+        return $this->hasMany(Visit::class);
+    }
 }

@@ -12,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 class SectionController extends Controller
 {
     use AuthorizesRequests;
+
     public function store(StoreSectionRequest $request): RedirectResponse
     {
         $menu = Menu::findOrFail($request->menu_id);

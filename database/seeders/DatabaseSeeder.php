@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             'upload_prato_3d',
             'analytics_basico',
             'analytics_avancado',
+
             'gerenciar_menu',
             'user.management',
         ];
@@ -118,6 +119,10 @@ class DatabaseSeeder extends Seeder
 
             // garante apenas um plano ativo
             $user->syncRoles([$data['role']]);
+
+            if ($data['role'] !== 'admin') {
+                \App\Models\Store::factory()->for($user)->create();
+            }
         }
 
         /*
@@ -126,8 +131,8 @@ class DatabaseSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
         $proUser = User::where('email', 'pro@mynu.com.br')->first();
-        if ($proUser) {
-            $menu = $proUser->menus()->create([
+        if ($proUser && $proUser->store) {
+            $menu = $proUser->store->menus()->create([
                 'name' => 'Cardápio Italiano',
                 'is_active' => true,
             ]);
@@ -141,6 +146,7 @@ class DatabaseSeeder extends Seeder
             ]);
 
             $entradasSection->dishes()->create([
+                'store_id' => $proUser->store->id,
                 'name' => 'Bruschetta Italiana',
                 'description' => 'Pão italiano tostado com tomate fresco, manjericão e azeite extra virgem',
                 'price' => 28.90,
@@ -150,6 +156,7 @@ class DatabaseSeeder extends Seeder
             ]);
 
             $entradasSection->dishes()->create([
+                'store_id' => $proUser->store->id,
                 'name' => 'Carpaccio de Salmão',
                 'description' => 'Salmão fresco em fatias finas com alcaparras e molho de mostarda',
                 'price' => 42.90,
@@ -167,6 +174,7 @@ class DatabaseSeeder extends Seeder
             ]);
 
             $massasSection->dishes()->create([
+                'store_id' => $proUser->store->id,
                 'name' => 'Spaghetti Carbonara',
                 'description' => 'Massa fresca com bacon, ovos, queijo pecorino e pimenta do reino',
                 'price' => 58.90,
@@ -176,6 +184,7 @@ class DatabaseSeeder extends Seeder
             ]);
 
             $massasSection->dishes()->create([
+                'store_id' => $proUser->store->id,
                 'name' => 'Ravioli de Funghi',
                 'description' => 'Ravioli recheado com cogumelos ao molho de manteiga e sálvia',
                 'price' => 62.90,
@@ -193,6 +202,7 @@ class DatabaseSeeder extends Seeder
             ]);
 
             $sobremesasSection->dishes()->create([
+                'store_id' => $proUser->store->id,
                 'name' => 'Tiramisù',
                 'description' => 'Clássica sobremesa italiana com café e mascarpone',
                 'price' => 32.90,
@@ -202,6 +212,7 @@ class DatabaseSeeder extends Seeder
             ]);
 
             $sobremesasSection->dishes()->create([
+                'store_id' => $proUser->store->id,
                 'name' => 'Panna Cotta',
                 'description' => 'Creme italiano com calda de frutas vermelhas',
                 'price' => 28.90,

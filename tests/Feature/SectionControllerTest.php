@@ -7,10 +7,10 @@ use Spatie\Permission\Models\Role;
 
 test('pro user can create a section', function () {
     Role::create(['name' => 'pro', 'guard_name' => 'web']);
-    
+
     $user = User::factory()->create();
     $user->assignRole('pro');
-    
+
     $menu = Menu::factory()->create(['user_id' => $user->id]);
 
     $response = $this->actingAs($user)->post(route('sections.store'), [
@@ -30,10 +30,10 @@ test('pro user can create a section', function () {
 
 test('pro user can update a section', function () {
     Role::create(['name' => 'pro', 'guard_name' => 'web']);
-    
+
     $user = User::factory()->create();
     $user->assignRole('pro');
-    
+
     $menu = Menu::factory()->create(['user_id' => $user->id]);
     $section = Section::factory()->create(['menu_id' => $menu->id]);
 
@@ -51,10 +51,10 @@ test('pro user can update a section', function () {
 
 test('pro user can delete a section', function () {
     Role::create(['name' => 'pro', 'guard_name' => 'web']);
-    
+
     $user = User::factory()->create();
     $user->assignRole('pro');
-    
+
     $menu = Menu::factory()->create(['user_id' => $user->id]);
     $section = Section::factory()->create(['menu_id' => $menu->id]);
 
