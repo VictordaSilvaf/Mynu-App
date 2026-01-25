@@ -1,7 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, useForm } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Store } from '@/types';
@@ -10,9 +10,11 @@ import { AtSign, Building, FileText, Instagram, Palette, Phone, PlusCircle, Tras
 import InputError from '@/components/input-error';
 import OperatingHoursForm from './operating-hours-form';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import React from 'react';
+import React, { useRef } from 'react';
 import { useMaskInput } from 'use-mask-input';
 import { PhoneInput } from './phone-input';
+import { toast } from 'sonner';
+import { ColorPicker } from '@/components/ui/color-picker';
 
 interface StoreFormProps {
     store: Store | null;
@@ -21,6 +23,8 @@ interface StoreFormProps {
 type StoreFormData = Omit<Store, 'id' | 'user_id' | 'created_at' | 'updated_at'>;
 
 export default function StoreForm({ store: storeData }: StoreFormProps) {
+    const formRef = useRef<any>(null);
+
     const { data, setData, post, patch, processing, errors } = useForm<StoreFormData>({
         name: storeData?.name ?? '',
         phones: storeData?.phones?.length ? storeData.phones : [''],
@@ -38,17 +42,6 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
             ? { mask: '999.999.999-99' }
             : { mask: '99.999.999/9999-99' },
     );
-
-    function handleSubmit(e: React.FormEvent) {
-        console.log('enviando')
-        e.preventDefault();
-
-        if (storeData) {
-            patch(update({ store: storeData.id }).url);
-        } else {
-            post(storeRoute().url);
-        }
-    }
 
     const handleAddField = (field: 'phones' | 'colors') => {
         setData(field, [...data[field], field === 'colors' ? '#000000' : '']);
@@ -68,8 +61,31 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
         setData(field, newFields);
     };
 
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (storeData) {
+            patch(update(storeData.id).url, {
+                onSuccess: () => {
+                    toast.success('Loja atualizada com sucesso!');
+                },
+                onError: () => {
+                    toast.error('Ocorreu um erro ao atualizar a loja.');
+                }
+            });
+        } else {
+            post(storeRoute().url, {
+                onSuccess: () => {
+                    toast.success('Loja criada com sucesso!');
+                },
+                onError: () => {
+                    toast.error('Ocorreu um erro ao criar a loja.');
+                }
+            });
+        }
+    };
+
     return (
-        <Form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} ref={formRef}>
             <Card>
                 <CardHeader>
                     <CardTitle>Informações da Loja</CardTitle>
@@ -111,19 +127,22 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
 
                     <div className="space-y-2">
                         <Label>Cores da Loja (até 3)</Label>
-                        {data.colors.map((color, index) => (
-                            <div key={index} className="flex items-center gap-2">
-                                <div className="relative flex-1">
-                                    <Palette className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                                    <Input type="color" value={color} onChange={(e) => handleFieldChange('colors', index, e.target.value)} className="pl-9" />
+                        <div className="flex flex-row gap-4">
+                            {data.colors.map((color, index) => (
+                                <div key={index} className="flex items-center gap-2">
+                                    <ColorPicker
+                                        color={color}
+                                        onChange={(newColor) => handleFieldChange('colors', index, newColor)}
+                                        className="flex-1"
+                                    />
+                                    {data.colors.length > 1 && (
+                                        <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveField('colors', index)}>
+                                            <Trash2 className="size-4 text-destructive" />
+                                        </Button>
+                                    )}
                                 </div>
-                                {data.colors.length > 1 && (
-                                    <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveField('colors', index)}>
-                                        <Trash2 className="size-4 text-destructive" />
-                                    </Button>
-                                )}
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                         {data.colors.length < 3 && (
                             <Button type="button" variant="outline" size="sm" onClick={() => handleAddField('colors')}>
                                 <PlusCircle className="mr-2 size-4" />
@@ -196,6 +215,6 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
                     </Button>
                 </CardFooter>
             </Card>
-        </Form>
+        </form>
     );
 }

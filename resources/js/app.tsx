@@ -7,6 +7,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
 import { ThemeProvider } from './components/theme-provider';
+import { Toaster } from 'sonner';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Mynu';
 
@@ -24,6 +25,7 @@ createInertiaApp({
             <StrictMode>
                 <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
                     <App {...props} />
+                    <Toaster />
                 </ThemeProvider>
             </StrictMode>,
         );

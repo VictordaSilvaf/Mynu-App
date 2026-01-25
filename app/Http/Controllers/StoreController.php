@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRequest;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class StoreController extends Controller
@@ -13,7 +14,7 @@ class StoreController extends Controller
     public function index()
     {
         return Inertia::render('store/index', [
-            'store' => auth()->user()->store,
+            'store' => Auth::user()->store,
         ]);
     }
 
