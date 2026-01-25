@@ -47,6 +47,19 @@ export interface User {
   [key: string]: unknown; // This allows for additional properties...
 }
 
+export interface DashboardMetricsData {
+  totalUsers: number;
+  activeStores: number;
+  totalMenus: number;
+  activeSubscriptions: number;
+  canceledSubscriptions: number;
+  expiredSubscriptions: number;
+  monthlyUserGrowth: { [key: string]: number };
+  monthlyStoreGrowth: { [key: string]: number };
+  monthlyMenuGrowth: { [key: string]: number };
+  monthlySubscriptionGrowth: { [key: string]: number };
+}
+
 export type MenuItem = {
   id: string
   name: string
@@ -183,6 +196,7 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
     auth: {
         user: User;
     };
+    metrics: DashboardMetricsData;
 };
 
 export type OperatingHours = {

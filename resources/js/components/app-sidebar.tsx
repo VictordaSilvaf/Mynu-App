@@ -16,9 +16,9 @@ import { Link, usePage } from '@inertiajs/react';
 import { ClipboardList, HouseIcon, LayoutGrid, Sparkle, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 import { index as subscriptionIndex } from '@/routes/subscription';
-import { index as userIndex } from '@/routes/admin/admin/users';
 import { index as menusIndex} from '@/routes/menus';
 import { index as storeIndex} from '@/routes/stores';
+import { index as userIndex } from '@/routes/users';
 
 const mainNavItems: NavItem[] = [
     {

@@ -2,62 +2,60 @@
 
 namespace App\Services;
 
-use App\DataTransferObjects\MetricData;
+use App\DataTransferObjects\DashboardMetricsData;
+use App\Models\Menu;
 use App\Models\Store;
-use App\Models\Visit;
+use App\Models\Subscription;
+use App\Models\User;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DashboardService
 {
-    public function __construct(
-        private readonly Store $store,
-        private readonly int $period = 7,
-    ) {}
+    public function __construct() {}
 
-    public function getMetrics(): MetricData
+    public function getGlobalMetrics(): DashboardMetricsData
     {
-        return new MetricData(
-            totalAccess: $this->getTotalAccess(),
-            activeProducts: $this->getActiveProducts(),
-            createdMenus: $this->getCreatedMenus(),
-            lastUpdate: $this->getLastUpdate(),
-            mostAccessedProducts: $this->getMostAccessedProducts(),
+        $totalUsers = User::count();
+        $activeStores = Store::count(); // Assuming all stores are active for now
+        $totalMenus = Menu::count();
+
+        $activeSubscriptions = Subscription::where('stripe_status', 'active')
+            ->orWhere('stripe_status', 'trialing')
+            ->count();
+
+        $canceledSubscriptions = Subscription::where('stripe_status', 'canceled')->count();
+
+        $expiredSubscriptions = Subscription::where('ends_at', '<', Carbon::now())->count();
+
+        $monthlyUserGrowth = $this->getMonthlyGrowth(new User, 'created_at');
+        $monthlyStoreGrowth = $this->getMonthlyGrowth(new Store, 'created_at');
+        $monthlyMenuGrowth = $this->getMonthlyGrowth(new Menu, 'created_at');
+        $monthlySubscriptionGrowth = $this->getMonthlyGrowth(new Subscription, 'created_at');
+
+        return new DashboardMetricsData(
+            totalUsers: $totalUsers,
+            activeStores: $activeStores,
+            totalMenus: $totalMenus,
+            activeSubscriptions: $activeSubscriptions,
+            canceledSubscriptions: $canceledSubscriptions,
+            expiredSubscriptions: $expiredSubscriptions,
+            monthlyUserGrowth: $monthlyUserGrowth,
+            monthlyStoreGrowth: $monthlyStoreGrowth,
+            monthlyMenuGrowth: $monthlyMenuGrowth,
+            monthlySubscriptionGrowth: $monthlySubscriptionGrowth,
         );
     }
 
-    private function getTotalAccess(): int
+    private function getMonthlyGrowth($model, string $dateColumn): array
     {
-        return $this->store->visits()->where('visited_at', '>=', Carbon::now()->subDays($this->period))->count();
-    }
-
-    private function getActiveProducts(): int
-    {
-        return $this->store->dishes()->where('is_active', true)->count();
-    }
-
-    private function getCreatedMenus(): int
-    {
-        return $this->store->menus()->where('created_at', '>=', Carbon::now()->subDays($this->period))->count();
-    }
-
-    private function getLastUpdate(): ?Carbon
-    {
-        $lastUpdate = $this->store->dishes()->max('updated_at');
-
-        return $lastUpdate ? Carbon::parse($lastUpdate) : null;
-    }
-
-    private function getMostAccessedProducts(): array
-    {
-        return Visit::query()
-            ->selectRaw('dish_id, count(*) as total')
-            ->where('store_id', $this->store->id)
-            ->where('visited_at', '>=', Carbon::now()->subDays($this->period))
-            ->groupBy('dish_id')
-            ->orderBy('total', 'desc')
-            ->limit(5)
-            ->with('dish')
+        return $model::query()
+            ->select(DB::raw("DATE_FORMAT({$dateColumn}, '%Y-%m') as month"), DB::raw('count(*) as count'))
+            ->groupBy('month')
+            ->orderBy('month')
             ->get()
+            ->keyBy('month')
+            ->map(fn ($item) => $item['count'])
             ->toArray();
     }
 }

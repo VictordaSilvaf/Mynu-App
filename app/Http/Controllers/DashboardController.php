@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\DashboardRequest;
-use App\Services\DashboardService;
+use App\Services\StoreDashboardService; // Use the new service
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -22,7 +22,8 @@ class DashboardController extends Controller
             ]);
         }
 
-        $metrics = (new DashboardService($store, $request->get('period', 7)))->getMetrics();
+        // Use StoreDashboardService instead of DashboardService
+        $metrics = (new StoreDashboardService($store, $request->get('period', 7)))->getMetrics();
 
         return Inertia::render('dashboard', [
             'metrics' => $metrics,
