@@ -40,7 +40,9 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
     );
 
     function handleSubmit(e: React.FormEvent) {
+        console.log('enviando')
         e.preventDefault();
+
         if (storeData) {
             patch(update({ store: storeData.id }).url);
         } else {

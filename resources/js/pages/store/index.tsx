@@ -20,12 +20,7 @@ export default function StorePage({ store }: StorePageProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Loja" />
-            <div className="flex flex-col gap-8">
-                <Heading
-                    title="Loja"
-                    description="Gerencie as informações da sua loja."
-                />
-
+            <div className="flex flex-col gap-8 p-4">
                 <StoreForm store={store} />
             </div>
         </AppLayout>
