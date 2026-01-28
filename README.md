@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/logo.svg" alt="Mynu Logo" width="120">
+  <img src="https://www.mynu.com.br/build/assets/logo-HQgeMKuK.png" alt="Mynu Logo" width="120">
   <h1>Mynu</h1>
   <p><strong>Uma plataforma moderna para criação e gerenciamento de cardápios digitais.</strong></p>
 </div>
