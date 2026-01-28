@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\DashboardRequest;
-use App\Services\StoreDashboardService; // Use the new service
+use App\Services\StoreDashboardService;
 use Inertia\Inertia;
 use Inertia\Response;
 

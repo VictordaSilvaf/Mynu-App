@@ -67,13 +67,13 @@ export default function Dashboard({ metrics, period }: {
                     </Select>
                 </div>
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                    <Card>
+                    <Card className='bg-linear-to-br from-primary/90 to-primary/60'>
                         <CardHeader>
-                            <CardTitle>Total de Acessos</CardTitle>
+                            <CardTitle className='text-white'>Total de Acessos</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-4xl font-bold">
-                                {metrics.totalAccess}
+                            <p className="text-4xl font-bold text-white">
+                                {metrics.totalAccess || 0}
                             </p>
                         </CardContent>
                     </Card>
@@ -83,7 +83,7 @@ export default function Dashboard({ metrics, period }: {
                         </CardHeader>
                         <CardContent>
                             <p className="text-4xl font-bold">
-                                {metrics.activeProducts}
+                                {metrics.activeProducts || 0}
                             </p>
                         </CardContent>
                     </Card>
@@ -93,7 +93,7 @@ export default function Dashboard({ metrics, period }: {
                         </CardHeader>
                         <CardContent>
                             <p className="text-4xl font-bold">
-                                {metrics.createdMenus}
+                                {metrics.createdMenus || 0}
                             </p>
                         </CardContent>
                     </Card>

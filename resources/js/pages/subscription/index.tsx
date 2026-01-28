@@ -60,6 +60,8 @@ export default function Index({
     subscription_status,
     has_payment_method,
 }: IndexProps) {
+    console.log(subscription_status, subscriptions, has_payment_method);
+
     const getStatusBadge = () => {
         if (subscription_status.on_trial) {
             return (

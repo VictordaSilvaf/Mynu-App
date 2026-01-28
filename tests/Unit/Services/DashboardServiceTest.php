@@ -7,7 +7,7 @@ use App\Models\Menu;
 use App\Models\Store;
 use App\Models\User;
 use App\Models\Visit;
-use App\Services\DashboardService;
+use App\Services\StoreDashboardService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
@@ -25,11 +25,11 @@ class DashboardServiceTest extends TestCase
         $this->store = Store::factory()->for(User::factory())->create();
     }
 
-    public function test_get_metrics(): void
+    public function test_it_gets_the_correct_metrics(): void
     {
         $this->createTestData();
 
-        $service = new DashboardService($this->store);
+        $service = new StoreDashboardService($this->store);
         $metrics = $service->getMetrics();
 
         $this->assertEquals(2, $metrics->totalAccess);
