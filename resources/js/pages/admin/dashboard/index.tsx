@@ -27,11 +27,11 @@ interface DashboardProps {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Admin',
-        href: adminDashboardIndex.url,
+        href: adminDashboardIndex.url(),
     },
     {
         title: 'Dashboard',
-        href: adminDashboardIndex.url,
+        href: adminDashboardIndex.url(),
     },
 ];
 
