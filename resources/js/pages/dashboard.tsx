@@ -1,7 +1,7 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
-import { DashboardMetricsData, type BreadcrumbItem, type PageProps } from '@/types';
+import { type BreadcrumbItem, type MetricData } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,7 +36,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Dashboard({ metrics, period }: {
-    metrics: DashboardMetricsData;
+    metrics: MetricData;
     period: string;
 }) {
     const handlePeriodChange = (value: string) => {

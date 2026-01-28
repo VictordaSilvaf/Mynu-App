@@ -17,7 +17,7 @@ class DashboardController extends Controller
     {
         $metrics = $this->dashboardService->getGlobalMetrics();
 
-        return Inertia::render('Admin/Dashboard/Index', [
+        return Inertia::render('admin/dashboard/Index', [
             'metrics' => $metrics,
         ]);
     }

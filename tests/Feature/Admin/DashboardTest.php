@@ -60,7 +60,7 @@ it('displays global metrics to admin users', function () {
         ->assertOk()
         ->assertInertia(
             fn (Assert $page) => $page
-                ->component('Admin/Dashboard/Index')
+                ->component('admin/dashboard/Index')
                 ->has('metrics', fn (Assert $page) => $page
                     ->where('totalUsers', $expectedTotalUsers)
                     ->where('activeStores', $expectedActiveStores)

@@ -60,6 +60,20 @@ export interface DashboardMetricsData {
   monthlySubscriptionGrowth: { [key: string]: number };
 }
 
+export interface MetricData {
+  totalAccess: number;
+  activeProducts: number;
+  createdMenus: number;
+  lastUpdate: string | null; // Carbon objects are typically serialized to strings
+  mostAccessedProducts: MostAccessedProduct[];
+}
+
+export interface MostAccessedProduct {
+  dish_id: number;
+  total: number;
+  dish: Dish; // Assuming Dish type is already defined
+}
+
 export type MenuItem = {
   id: string
   name: string
@@ -196,7 +210,6 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
     auth: {
         user: User;
     };
-    metrics: DashboardMetricsData;
 };
 
 export type OperatingHours = {
@@ -221,4 +234,5 @@ export interface Store {
     created_at: string;
     updated_at: string;
 }
+
 
