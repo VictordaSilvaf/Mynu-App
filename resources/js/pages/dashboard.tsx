@@ -107,8 +107,8 @@ export default function Dashboard({ metrics, period }: {
                             <p className="text-lg">
                                 {metrics.lastUpdate
                                     ? new Date(
-                                          metrics.lastUpdate,
-                                      ).toLocaleDateString()
+                                        metrics.lastUpdate,
+                                    ).toLocaleDateString()
                                     : 'Nenhuma atualização'}
                             </p>
                         </CardContent>
