@@ -103,19 +103,21 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
 
                     <div className="space-y-2">
                         <Label>Telefones (até 3)</Label>
-                        {data.phones.map((phone, index) => (
-                            <div key={index} className="flex items-center gap-2">
-                                <div className="relative flex-1">
-                                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                                    <PhoneInput value={phone} onChange={(e) => handleFieldChange('phones', index, e.target.value)} className="pl-9" placeholder="(99) 99999-9999" />
+                        <div className="grid grid-cols-3 gap-4">
+                            {data.phones.map((phone, index) => (
+                                <div key={index} className="flex items-center gap-2">
+                                    <div className="relative flex-1">
+                                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                                        <PhoneInput value={phone} onChange={(e) => handleFieldChange('phones', index, e.target.value)} className="pl-9" placeholder="(99) 99999-9999" />
+                                    </div>
+                                    {data.phones.length > 1 && (
+                                        <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveField('phones', index)}>
+                                            <Trash2 className="size-4 text-destructive" />
+                                        </Button>
+                                    )}
                                 </div>
-                                {data.phones.length > 1 && (
-                                    <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveField('phones', index)}>
-                                        <Trash2 className="size-4 text-destructive" />
-                                    </Button>
-                                )}
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                         {data.phones.length < 3 && (
                             <Button type="button" variant="outline" size="sm" onClick={() => handleAddField('phones')}>
                                 <PlusCircle className="mr-2 size-4" />
@@ -172,7 +174,7 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
                         <Label htmlFor="instagram">Instagram</Label>
                         <div className="relative">
                             <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                            <Input id="instagram" value={data.instagram} onChange={(e) => setData('instagram', e.target.value)} className="pl-9" placeholder="seunegocio" />
+                            <Input id="instagram" value={data.instagram} onChange={(e) => setData('instagram', e.target.value)} className="pl-9" placeholder="@seunegocio" />
                         </div>
                         <InputError message={errors.instagram} />
                     </div>
