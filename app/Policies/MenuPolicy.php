@@ -29,7 +29,7 @@ class MenuPolicy
      */
     public function create(User $user)
     {
-       return app(MenuLimitService::class)->authorizeCreate($user);
+        return app(MenuLimitService::class)->authorizeCreate($user);
     }
 
     /**

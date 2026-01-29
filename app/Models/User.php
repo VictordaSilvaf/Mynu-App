@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\PlanType;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
