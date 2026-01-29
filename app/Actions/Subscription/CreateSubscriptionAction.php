@@ -2,7 +2,7 @@
 
 namespace App\Actions\Subscription;
 
-use App\DataTransferObjects\Subscription\SubscriptionData;
+use App\DTO\Subscription\SubscriptionData;
 use App\Models\User;
 use Laravel\Cashier\Subscription;
 

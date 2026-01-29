@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\DataTransferObjects\DashboardMetricsData;
+use App\DTO\DashboardMetricsData;
 use App\Models\Menu;
 use App\Models\Store;
 use App\Models\Subscription;

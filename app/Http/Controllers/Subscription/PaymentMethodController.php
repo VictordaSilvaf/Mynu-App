@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Subscription;
 
-use App\DataTransferObjects\Subscription\PaymentMethodData;
+use App\DTO\Subscription\PaymentMethodData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Subscription\UpdatePaymentMethodRequest;
 use App\Services\SubscriptionService;

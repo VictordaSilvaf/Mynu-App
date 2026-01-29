@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DataTransferObjects\Subscription;
+namespace App\DTO\Subscription;
 
 use Illuminate\Support\Collection;
 

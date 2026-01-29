@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\DataTransferObjects\MetricData;
+use App\DTO\MetricData;
 use App\Models\Store;
 use App\Models\Visit;
 use Illuminate\Support\Carbon;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DataTransferObjects\Subscription;
+namespace App\DTO\Subscription;
 
 final readonly class PlanChangeData
 {

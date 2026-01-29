@@ -2,7 +2,7 @@
 
 namespace App\Actions\Subscription;
 
-use App\DataTransferObjects\Subscription\PlanChangeData;
+use App\DTO\Subscription\PlanChangeData;
 use App\Models\User;
 use Laravel\Cashier\Subscription;
 

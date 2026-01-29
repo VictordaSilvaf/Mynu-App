@@ -2,7 +2,7 @@
 
 namespace App\Actions\Subscription;
 
-use App\DataTransferObjects\Subscription\PaymentMethodData;
+use App\DTO\Subscription\PaymentMethodData;
 use App\Models\User;
 
 final class UpdatePaymentMethodAction

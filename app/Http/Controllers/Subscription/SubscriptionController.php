@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Subscription;
 
-use App\DataTransferObjects\Subscription\PlanChangeData;
-use App\DataTransferObjects\Subscription\SubscriptionData;
+use App\DTO\Subscription\PlanChangeData;
+use App\DTO\Subscription\SubscriptionData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Subscription\CancelSubscriptionRequest;
 use App\Http\Requests\Subscription\ChangePlanRequest;
