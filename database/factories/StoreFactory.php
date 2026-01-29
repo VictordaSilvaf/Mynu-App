@@ -19,14 +19,14 @@ class StoreFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'name' => fake()->company(),
-            'phones' => [fake()->phoneNumber()],
-            'colors' => [fake()->hexColor()],
+            'name' => $this->faker->company,
+            'phones' => ['(11) 9'.$this->faker->numerify('########')],
+            'colors' => [$this->faker->hexColor],
             'operating_hours' => [],
-            'whatsapp' => '+55119'.fake()->numerify('########'),
-            'instagram' => fake()->userName(),
+            'whatsapp' => '(11) 9'.$this->faker->numerify('########'),
+            'instagram' => $this->faker->userName,
             'document_type' => 'cnpj',
-            'document_number' => fake()->numerify('##############'),
+            'document_number' => $this->faker->numerify('##############'),
         ];
     }
 }
