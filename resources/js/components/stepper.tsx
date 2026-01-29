@@ -1,11 +1,12 @@
 import { Check } from "lucide-react";
+import { Fragment } from "react/jsx-runtime";
 
 
 export default function Stepper({ step, steps, setStep }: { step: number; steps: string[]; setStep: (step: number) => void }) {
     return (
         <div className="flex items-center gap-2 justify-between divide-solid">
             {steps.map((label, index) => (
-                <>
+                <Fragment key={index}>
                     <div key={index} className="flex items-center gap-2">
                         <div
                             onClick={() => setStep(index)}
@@ -26,7 +27,7 @@ export default function Stepper({ step, steps, setStep }: { step: number; steps:
                     {index < steps.length - 1 && (
                         <div className="flex-1 h-0.5 bg-gray-200 mx-2"></div>
                     )}
-                </>
+                </Fragment>
             ))}
         </div>
     );

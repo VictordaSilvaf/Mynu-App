@@ -24,11 +24,11 @@ class StoreRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'phones' => ['nullable', 'array', 'max:3'],
-            'phones.*' => ['nullable', 'string'],
+            'phones.*' => ['nullable', 'string', 'regex:/^\(\d{2}\)\s\d{4,5}-\d{4}$/'],
             'colors' => ['nullable', 'array', 'max:3'],
             'colors.*' => ['nullable', 'string'],
             'operating_hours' => ['nullable', 'array'],
-            'whatsapp' => ['nullable', 'string', 'regex:/^\+[1-9]\d{1,14}$/'],
+            'whatsapp' => ['nullable', 'string', 'regex:/^\(\d{2}\)\s\d{4,5}-\d{4}$/'],
             'instagram' => ['nullable', 'string', 'max:255'],
             'document_type' => ['nullable', 'in:cpf,cnpj'],
             'document_number' => ['nullable', 'string', 'max:20'],

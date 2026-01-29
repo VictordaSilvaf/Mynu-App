@@ -13,8 +13,25 @@ class StoreController extends Controller
      */
     public function index()
     {
+        $user = Auth::user();
+
+        $store = $user->store;
+
+        if (! $store) {
+            $store = $user->store()->create([
+                'name' => null,
+                'phones' => [],
+                'colors' => ['#000000'],
+                'operating_hours' => [],
+                'whatsapp' => null,
+                'instagram' => null,
+                'document_type' => null,
+                'document_number' => null,
+            ]);
+        }
+
         return Inertia::render('store/index', [
-            'store' => Auth::user()->store,
+            'store' => $store,
         ]);
     }
 

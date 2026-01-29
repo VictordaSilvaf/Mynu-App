@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Menu;
 use App\Models\User;
+use App\Services\Menu\MenuLimitService;
 
 class MenuPolicy
 {
@@ -26,9 +27,9 @@ class MenuPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user)
     {
-        return true;
+       return app(MenuLimitService::class)->authorizeCreate($user);
     }
 
     /**

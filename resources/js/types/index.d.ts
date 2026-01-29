@@ -28,6 +28,11 @@ export interface SharedData {
   quote: { message: string; author: string };
   auth: Auth;
   sidebarOpen: boolean;
+  public_key: string;
+  flash: {
+    success?: string;
+    error?: string;
+  };
   [key: string]: unknown;
 }
 

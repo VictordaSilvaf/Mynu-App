@@ -31,6 +31,8 @@ class MenuController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $this->authorize('create', Menu::class);
+
         if (! $request->user()->store) {
             return redirect()->route('stores.index');
         }
