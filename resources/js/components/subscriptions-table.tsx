@@ -111,7 +111,7 @@ export function SubscriptionsTable({ columns, data }: SubscriptionsTableProps) {
                                     colSpan={columns.length}
                                     className="h-24 text-center"
                                 >
-                                    No results.
+                                    Nenhuma cobrança encontrada.
                                 </TableCell>
                             </TableRow>
                         )}

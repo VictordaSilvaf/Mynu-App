@@ -6,7 +6,6 @@ use App\DTO\Subscription\PaymentMethodData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Subscription\UpdatePaymentMethodRequest;
 use App\Services\SubscriptionService;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -44,10 +43,10 @@ class PaymentMethodController extends Controller
                 $paymentMethodData
             );
 
-        return redirect()->back()->with('success', 'Método de pagamento atualizado com sucesso!');
-            
+            return redirect()->back()->with('success', 'Método de pagamento atualizado com sucesso!');
+
         } catch (\Exception $e) {
-                    return redirect()->back()->with('error', 'Erro ao atualizar método de pagamento');
+            return redirect()->back()->with('error', 'Erro ao atualizar método de pagamento');
 
         }
     }
@@ -70,7 +69,7 @@ class PaymentMethodController extends Controller
 
             $paymentMethod->delete();
 
-        return redirect()->back()->with('success', 'Método de pagamento removido com sucesso!');
+            return redirect()->back()->with('success', 'Método de pagamento removido com sucesso!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Erro ao remover método de pagamento');
         }

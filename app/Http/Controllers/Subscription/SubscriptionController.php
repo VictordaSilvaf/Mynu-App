@@ -11,6 +11,8 @@ use App\Http\Requests\Subscription\CreateSubscriptionRequest;
 use App\Services\SubscriptionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Cashier\Exceptions\IncompletePayment;
@@ -27,9 +29,50 @@ class SubscriptionController extends Controller
     public function index(Request $request): Response
     {
         $user = $request->user();
+        $plans = config('plans.plans');
+        $subscriptions = $this->subscriptionService->getAllSubscriptions($user)
+            ->map(function ($subscription) use ($plans) {
+                $planName = null;
+
+                foreach ($plans as $plan) {
+                    $monthlyMatch = isset($plan['price_id_monthly']) && $plan['price_id_monthly'] === $subscription->stripe_price;
+                    $yearlyMatch = isset($plan['price_id_yearly']) && $plan['price_id_yearly'] === $subscription->stripe_price;
+                    $defaultMatch = isset($plan['price_id']) && $plan['price_id'] === $subscription->stripe_price;
+
+                    if ($monthlyMatch || $yearlyMatch || $defaultMatch) {
+                        $planName = $plan['name'] ?? null;
+                        break;
+                    }
+                }
+
+                $nextBillingAt = $subscription->trial_ends_at ?? $subscription->ends_at;
+
+                if (! $nextBillingAt && ! app()->environment('testing')) {
+                    try {
+                        $stripeSubscription = $subscription->asStripeSubscription();
+
+                        if (! empty($stripeSubscription->current_period_end)) {
+                            $nextBillingAt = Carbon::createFromTimestamp(
+                                $stripeSubscription->current_period_end
+                            );
+                        }
+                    } catch (\Throwable) {
+                        $nextBillingAt = null;
+                    }
+                }
+
+                $resolvedPlanName = $planName ?? $subscription->type ?? 'Plano';
+
+                return [
+                    'id' => $subscription->id,
+                    'plan_name' => Str::title(str_replace('_', ' ', $resolvedPlanName)),
+                    'next_billing_date' => $nextBillingAt?->toIso8601String(),
+                ];
+            })
+            ->values();
 
         return Inertia::render('subscription/index', [
-            'subscriptions' => $this->subscriptionService->getAllSubscriptions($user),
+            'subscriptions' => $subscriptions,
             'subscription_status' => $this->subscriptionService->getSubscriptionStatus($user),
             'has_payment_method' => $user->hasDefaultPaymentMethod(),
         ]);

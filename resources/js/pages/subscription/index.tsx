@@ -31,7 +31,7 @@ import { columns } from '@/components/subscriptions-table-columns'
 interface Subscription {
     id: number
     plan_name: string
-    next_billing_date: string
+    next_billing_date: string | null
 }
 
 interface SubscriptionStatus {
