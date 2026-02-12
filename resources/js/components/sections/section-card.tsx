@@ -2,6 +2,17 @@ import { Section } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Edit, Plus, Trash2, GripVertical } from 'lucide-react';
 import { DishCard } from '@/components/dishes/dish-card';
 import { DishModal } from '@/components/dishes/dish-modal';
@@ -18,16 +29,50 @@ interface SectionCardProps {
 export function SectionCard({ section, menuId }: SectionCardProps) {
     const [dishModalOpen, setDishModalOpen] = useState(false);
     const [sectionModalOpen, setSectionModalOpen] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false);
+
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: section.id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
+
+    const handleToggle = (checked: boolean) => {
+        setIsUpdating(true);
+        router.put(
+            sections.update(section.id).url,
+            { is_active: checked },
+            {
+                preserveScroll: true,
+                onFinish: () => setIsUpdating(false),
+            }
+        );
+    };
 
     const handleDelete = () => {
-        if (confirm('Tem certeza que deseja excluir esta seção? Todos os pratos serão excluídos também.')) {
-            router.delete(sections.destroy(section.id).url);
-        }
+        setIsDeleting(true);
+        router.delete(sections.destroy(section.id).url, {
+            onFinish: () => {
+                setIsDeleting(false);
+                setDeleteDialogOpen(false);
+            },
+        });
     };
 
     return (
         <>
-            <Card>
+            <Card ref={setNodeRef} style={style}>
                 <CardHeader>
                     <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3 flex-1">
@@ -35,15 +80,25 @@ export function SectionCard({ section, menuId }: SectionCardProps) {
                                 variant="ghost"
                                 size="icon"
                                 className="cursor-move mt-1"
+                                {...attributes}
+                                {...listeners}
                             >
                                 <GripVertical className="size-4 text-muted-foreground" />
                             </Button>
                             <div className="flex-1">
                                 <div className="flex items-center gap-2">
                                     <CardTitle className="text-xl">{section.name}</CardTitle>
-                                    <Badge variant={section.is_active ? 'default' : 'secondary'} className="text-xs">
-                                        {section.is_active ? 'Ativa' : 'Inativa'}
-                                    </Badge>
+                                    <div className="flex items-center gap-2">
+                                        <Switch
+                                            checked={section.is_active}
+                                            onCheckedChange={handleToggle}
+                                            disabled={isUpdating}
+                                            size="sm"
+                                        />
+                                        <span className="text-xs text-muted-foreground">
+                                            {section.is_active ? 'Ativa' : 'Inativa'}
+                                        </span>
+                                    </div>
                                 </div>
                                 {section.description && (
                                     <CardDescription className="mt-1">
@@ -64,7 +119,7 @@ export function SectionCard({ section, menuId }: SectionCardProps) {
                             <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={handleDelete}
+                                onClick={() => setDeleteDialogOpen(true)}
                             >
                                 <Trash2 className="size-4" />
                             </Button>
@@ -120,6 +175,33 @@ export function SectionCard({ section, menuId }: SectionCardProps) {
                 menuId={menuId}
                 section={section}
             />
+
+            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Excluir Seção</DialogTitle>
+                        <DialogDescription>
+                            Tem certeza que deseja excluir a seção "{section.name}"? Todos os pratos desta seção serão excluídos também. Esta ação não pode ser desfeita.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => setDeleteDialogOpen(false)}
+                            disabled={isDeleting}
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={handleDelete}
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? 'Excluindo...' : 'Sim, Excluir'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }

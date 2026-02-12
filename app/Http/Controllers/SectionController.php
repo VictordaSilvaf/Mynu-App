@@ -41,4 +41,21 @@ class SectionController extends Controller
 
         return redirect()->back();
     }
+
+    public function reorder(\Illuminate\Http\Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'sections' => 'required|array',
+            'sections.*.id' => 'required|exists:sections,id',
+            'sections.*.order' => 'required|integer',
+        ]);
+
+        foreach ($validated['sections'] as $sectionData) {
+            $section = Section::find($sectionData['id']);
+            $this->authorize('update', $section->menu);
+            $section->update(['order' => $sectionData['order']]);
+        }
+
+        return redirect()->back();
+    }
 }

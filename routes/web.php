@@ -31,6 +31,8 @@ require __DIR__.'/subscription.php';
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 
+    Route::post('menus/reorder', [MenuController::class, 'reorder'])->name('menus.reorder')->middleware(['hasAccessToMenu']);
+
     Route::resource('menus', MenuController::class)->middleware(['hasAccessToMenu'])->names([
         'index' => 'menus.index',
         'store' => 'menus.store',
@@ -41,6 +43,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('stores', StoreController::class)->only(['index', 'store', 'update']);
 
     Route::middleware(['role:pro|enterprise'])->group(function () {
+        Route::post('sections/reorder', [SectionController::class, 'reorder'])->name('sections.reorder');
         Route::resource('sections', SectionController::class)->only(['store', 'update', 'destroy']);
         Route::resource('dishes', DishController::class)->only(['store', 'update', 'destroy']);
     });

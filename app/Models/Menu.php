@@ -16,10 +16,12 @@ class Menu extends Model
         'store_id',
         'name',
         'is_active',
+        'order',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'order' => 'integer',
     ];
 
     public function store(): BelongsTo

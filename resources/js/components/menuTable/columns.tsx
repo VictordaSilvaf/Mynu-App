@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { ColumnDef } from "@tanstack/react-table"
-import { Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
+import { Eye, MoreHorizontal, Pencil, Trash2, GripVertical } from "lucide-react"
 import { router } from "@inertiajs/react"
 
 import { Button } from "@/components/ui/button"
@@ -25,7 +25,8 @@ import {
 import { Menu } from "@/types"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { Badge } from "@/components/ui/badge"
-import { index as menusIndex, show as menusShow, destroy as menusDestroy } from "@/routes/menus"
+import { Switch } from "@/components/ui/switch"
+import { index as menusIndex, show as menusShow, destroy as menusDestroy, update as menusUpdate } from "@/routes/menus"
 
 function ActionsCell({ menu }: { menu: Menu }) {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -101,6 +102,19 @@ function ActionsCell({ menu }: { menu: Menu }) {
 
 export const columns: ColumnDef<Menu>[] = [
     {
+        id: "drag-handle",
+        header: "",
+        cell: () => (
+            <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 cursor-move"
+            >
+                <GripVertical className="h-4 w-4 text-muted-foreground" />
+            </Button>
+        ),
+    },
+    {
         accessorKey: "name",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Nome" />
@@ -123,12 +137,32 @@ export const columns: ColumnDef<Menu>[] = [
             <DataTableColumnHeader column={column} title="Status" />
         ),
         cell: ({ row }) => {
-            const isActive = row.original.is_active
+            const menu = row.original
+            const [isUpdating, setIsUpdating] = useState(false)
+
+            const handleToggle = (checked: boolean) => {
+                setIsUpdating(true)
+                router.put(
+                    menusUpdate(menu.id).url,
+                    { is_active: checked },
+                    {
+                        preserveScroll: true,
+                        onFinish: () => setIsUpdating(false),
+                    }
+                )
+            }
 
             return (
-                <Badge variant={isActive ? "default" : "outline"}>
-                    {isActive ? "Ativo" : "Inativo"}
-                </Badge>
+                <div className="flex items-center gap-2">
+                    <Switch
+                        checked={menu.is_active}
+                        onCheckedChange={handleToggle}
+                        disabled={isUpdating}
+                    />
+                    <span className="text-sm text-muted-foreground">
+                        {menu.is_active ? "Ativo" : "Inativo"}
+                    </span>
+                </div>
             )
         },
         filterFn: (row, id, value) => {

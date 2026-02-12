@@ -13,6 +13,24 @@ import {
 } from "@tanstack/react-table"
 
 import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent,
+} from "@dnd-kit/core"
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    useSortable,
+    verticalListSortingStrategy,
+} from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
+
+import {
     Table,
     TableBody,
     TableCell,
@@ -25,7 +43,47 @@ import React from "react"
 import { Input } from "../ui/input"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import { statuses } from "./data"
-import MenuModal from "../menu-modal"
+import { Menu } from "@/types"
+import { router } from "@inertiajs/react"
+import { reorder as menusReorder } from "@/routes/menus"
+
+interface SortableRowProps {
+    row: any
+}
+
+function SortableRow({ row }: SortableRowProps) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: row.original.id })
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    }
+
+    return (
+        <TableRow
+            ref={setNodeRef}
+            style={style}
+            data-state={row.getIsSelected() && "selected"}
+        >
+            {row.getVisibleCells().map((cell: any, index: number) => (
+                <TableCell
+                    key={cell.id}
+                    {...(index === 0 ? { ...attributes, ...listeners } : {})}
+                >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableCell>
+            ))}
+        </TableRow>
+    )
+}
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -38,9 +96,47 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+    const [items, setItems] = React.useState<TData[]>(data)
+
+    React.useEffect(() => {
+        setItems(data)
+    }, [data])
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    )
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event
+
+        if (!over || active.id === over.id) {
+            return
+        }
+
+        const oldIndex = items.findIndex((item: any) => item.id === active.id)
+        const newIndex = items.findIndex((item: any) => item.id === over.id)
+
+        const newItems = arrayMove(items, oldIndex, newIndex)
+        setItems(newItems)
+
+        // Update order in backend
+        const menusWithOrder = newItems.map((item: any, index: number) => ({
+            id: item.id,
+            order: index,
+        }))
+
+        router.post(menusReorder().url, {
+            menus: menusWithOrder,
+        }, {
+            preserveScroll: true,
+        })
+    }
 
     const table = useReactTable({
-        data,
+        data: items,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
@@ -86,8 +182,6 @@ export function DataTable<TData, TValue>({
                             </Button>
                         )}
                     </div>
-
-                    <MenuModal />
                 </div>
             </div>
             <div className="overflow-hidden rounded-md border">
@@ -110,28 +204,30 @@ export function DataTable<TData, TValue>({
                             </TableRow>
                         ))}
                     </TableHeader>
-                    <TableBody>
-                        {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={row.getIsSelected() && "selected"}
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                    >
+                        <SortableContext
+                            items={items.map((item: any) => item.id)}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            <TableBody>
+                                {table.getRowModel().rows?.length ? (
+                                    table.getRowModel().rows.map((row) => (
+                                        <SortableRow key={row.id} row={row} />
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={columns.length} className="h-24 text-center">
+                                            Nenhum resultado.
                                         </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    Nenhum resultado.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </SortableContext>
+                    </DndContext>
                 </Table>
             </div>
             <div className="flex items-center justify-end space-x-2 py-4">

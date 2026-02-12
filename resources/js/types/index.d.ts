@@ -112,6 +112,7 @@ export type Menu = {
   name: string
   is_active: boolean
   user_id: number
+  order: number
   created_at: string
   updated_at: string
 

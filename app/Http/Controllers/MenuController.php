@@ -21,7 +21,7 @@ class MenuController extends Controller
             ]);
         }
 
-        $menus = $request->user()->store->menus()->latest()->get();
+        $menus = $request->user()->store->menus()->orderBy('order')->get();
 
         return Inertia::render('menus', [
             'menus' => $menus,
@@ -80,5 +80,22 @@ class MenuController extends Controller
         $menu->delete();
 
         return redirect()->route('menus.index');
+    }
+
+    public function reorder(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'menus' => 'required|array',
+            'menus.*.id' => 'required|exists:menus,id',
+            'menus.*.order' => 'required|integer',
+        ]);
+
+        foreach ($validated['menus'] as $menuData) {
+            $menu = Menu::find($menuData['id']);
+            $this->authorize('update', $menu);
+            $menu->update(['order' => $menuData['order']]);
+        }
+
+        return redirect()->back();
     }
 }
