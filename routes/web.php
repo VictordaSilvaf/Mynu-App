@@ -31,7 +31,7 @@ require __DIR__.'/subscription.php';
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 
-    Route::resource('menus', MenuController::class)->middleware(['role:pro|enterprise'])->names([
+    Route::resource('menus', MenuController::class)->middleware(['hasAccessToMenu'])->names([
         'index' => 'menus.index',
         'store' => 'menus.store',
         'show' => 'menus.show',

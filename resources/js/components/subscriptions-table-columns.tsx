@@ -11,10 +11,11 @@ interface Subscription {
 export const columns: ColumnDef<Subscription>[] = [
     {
         accessorKey: 'plan_name',
-        header: 'Plan',
+        header: 'Plano',
     },
     {
         accessorKey: 'next_billing_date',
-        header: 'Next Billing Date',
+        header: 'Próxima Data de Cobrança',
     },
 ]
+
