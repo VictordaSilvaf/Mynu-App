@@ -5,6 +5,7 @@ import {
     index as subscriptionIndex,
     manage as subscriptionManage,
 } from '@/routes/subscription'
+import { index as paymentMethodsIndex } from '@/routes/payment-methods'
 import { BreadcrumbItem } from '@/types'
 import { Button } from '@/components/ui/button'
 import {
@@ -195,9 +196,17 @@ export default function Index({
                                                 : '❌ Nenhum cartão cadastrado'}
                                         </p>
                                     </div>
-                                    {!has_payment_method && (
-                                        <Button variant="outline">
-                                            Adicionar Cartão
+                                    {has_payment_method ? (
+                                        <Button variant="outline" asChild>
+                                            <Link href={paymentMethodsIndex().url}>
+                                                Gerenciar Cartões
+                                            </Link>
+                                        </Button>
+                                    ) : (
+                                        <Button variant="outline" asChild>
+                                            <Link href={paymentMethodsIndex().url}>
+                                                Adicionar Cartão
+                                            </Link>
                                         </Button>
                                     )}
                                 </div>

@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { PageProps } from '@inertiajs/core';
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { BreadcrumbItem } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ import {
     Shield
 } from 'lucide-react';
 import { index as subscriptionIndex } from '@/routes/subscription';
+import { index as paymentMethodsIndex } from '@/routes/payment-methods';
 import { useState } from 'react';
 import {
     Dialog,
@@ -439,9 +440,11 @@ export default function Manage({
                                                 <div className="text-sm text-muted-foreground">•••• •••• •••• ••••</div>
                                             </div>
                                         </div>
-                                        <Button variant="outline" className="w-full gap-2">
-                                            <Settings className="h-4 w-4" />
-                                            Atualizar Cartão
+                                        <Button variant="outline" className="w-full gap-2" asChild>
+                                            <Link href={paymentMethodsIndex().url}>
+                                                <Settings className="h-4 w-4" />
+                                                Atualizar Cartão
+                                            </Link>
                                         </Button>
                                     </>
                                 ) : (
@@ -452,9 +455,11 @@ export default function Manage({
                                                 Nenhum cartão cadastrado
                                             </p>
                                         </div>
-                                        <Button className="w-full gap-2">
-                                            <CreditCard className="h-4 w-4" />
-                                            Adicionar Cartão
+                                        <Button className="w-full gap-2" asChild>
+                                            <Link href={paymentMethodsIndex().url}>
+                                                <CreditCard className="h-4 w-4" />
+                                                Adicionar Cartão
+                                            </Link>
                                         </Button>
                                     </>
                                 )}

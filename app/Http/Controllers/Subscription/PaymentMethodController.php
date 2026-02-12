@@ -34,7 +34,7 @@ class PaymentMethodController extends Controller
     /**
      * Update payment method.
      */
-    public function update(UpdatePaymentMethodRequest $request): JsonResponse
+    public function update(UpdatePaymentMethodRequest $request)
     {
         try {
             $paymentMethodData = PaymentMethodData::fromRequest($request->validated());
@@ -44,20 +44,18 @@ class PaymentMethodController extends Controller
                 $paymentMethodData
             );
 
-            return response()->json([
-                'message' => 'Método de pagamento atualizado com sucesso!',
-            ]);
+        return redirect()->back()->with('success', 'Método de pagamento atualizado com sucesso!');
+            
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 422);
+                    return redirect()->back()->with('error', 'Erro ao atualizar método de pagamento');
+
         }
     }
 
     /**
      * Delete payment method.
      */
-    public function destroy(Request $request, string $paymentMethodId): JsonResponse
+    public function destroy(Request $request, string $paymentMethodId)
     {
         try {
             $user = $request->user();
@@ -72,13 +70,9 @@ class PaymentMethodController extends Controller
 
             $paymentMethod->delete();
 
-            return response()->json([
-                'message' => 'Método de pagamento removido com sucesso!',
-            ]);
+        return redirect()->back()->with('success', 'Método de pagamento removido com sucesso!');
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 422);
+            return redirect()->back()->with('error', 'Erro ao remover método de pagamento');
         }
     }
 }

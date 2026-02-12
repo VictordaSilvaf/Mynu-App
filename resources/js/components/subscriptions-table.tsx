@@ -52,7 +52,7 @@ export function SubscriptionsTable({ columns, data }: SubscriptionsTableProps) {
         <div>
             <div className="flex items-center py-4">
                 <Input
-                    placeholder="Filter plans..."
+                    placeholder="Buscar por plano..."
                     value={
                         (table.getColumn('plan_name')?.getFilterValue() as string) ??
                         ''

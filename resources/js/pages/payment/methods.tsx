@@ -8,6 +8,7 @@ import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-
 import { loadStripe, type Appearance } from '@stripe/stripe-js';
 import { AlertCircle, Check, CreditCard, Plus, Trash2, X } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
+import { toast } from 'sonner';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY || '');
 
@@ -160,23 +161,33 @@ function PaymentMethodCard({
     const [isDeleting, setIsDeleting] = useState(false);
 
     const handleDelete = async () => {
-        if (!confirm('Tem certeza que deseja remover este método de pagamento?')) {
-            return;
-        }
+        toast('Tem certeza que deseja remover este método de pagamento?', {
+            action: {
+                label: 'Confirmar',
+                onClick: () => {
+                    setIsDeleting(true);
 
-        setIsDeleting(true);
-
-        router.delete(destroy({ paymentMethodId: paymentMethod.id }).url, {
-            preserveState: true,
-            preserveScroll: true,
-            onSuccess: () => {
-                onDelete(paymentMethod.id);
+                    router.delete(destroy({ paymentMethodId: paymentMethod.id }).url, {
+                        preserveState: true,
+                        preserveScroll: true,
+                        onSuccess: () => {
+                            onDelete(paymentMethod.id);
+                        },
+                        onError: () => {
+                            setIsDeleting(false);
+                            alert('Erro ao remover método de pagamento');
+                        },
+                    });
+                }
             },
-            onError: () => {
-                setIsDeleting(false);
-                alert('Erro ao remover método de pagamento');
+            cancel: {
+                label: 'Cancelar',
+                onClick: () => {
+                    setIsDeleting(false);
+                }
             },
-        });
+            position: 'bottom-center'
+        })
     };
 
     const cardBrandImages: Record<string, string> = {
