@@ -25,6 +25,7 @@ import React from "react"
 import { Input } from "../ui/input"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import { statuses } from "./data"
+import MenuModal from "../menu-modal"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -58,31 +59,35 @@ export function DataTable<TData, TValue>({
     return (
         <div className="">
             <div className="flex items-center justify-between">
-                <div className="flex flex-1 items-center space-x-2 mb-4">
-                    <Input
-                        placeholder="Filtrar cardápios..."
-                        value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-                        onChange={(event) =>
-                            table.getColumn("name")?.setFilterValue(event.target.value)
-                        }
-                        className="h-8 w-[150px] lg:w-[250px]"
-                    />
-                    {table.getColumn("is_active") && (
-                        <DataTableFacetedFilter
-                            column={table.getColumn("is_active")}
-                            title="Status"
-                            options={statuses}
+                <div className="flex flex-1 flex-col md:flex-row items-center space-x-2 mb-4 w-full gap-2">
+                    <div className="flex-1 flex flex-col md:flex-row gap-2 items-center w-full">
+                        <Input
+                            placeholder="Filtrar cardápios..."
+                            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+                            onChange={(event) =>
+                                table.getColumn("name")?.setFilterValue(event.target.value)
+                            }
+                            className="h-8 w-[150px] lg:w-[250px]"
                         />
-                    )}
-                    {isFiltered && (
-                        <Button
-                            variant="ghost"
-                            onClick={() => table.resetColumnFilters()}
-                            className="h-8 px-2 lg:px-3"
-                        >
-                            Reset
-                        </Button>
-                    )}
+                        {table.getColumn("is_active") && (
+                            <DataTableFacetedFilter
+                                column={table.getColumn("is_active")}
+                                title="Status"
+                                options={statuses}
+                            />
+                        )}
+                        {isFiltered && (
+                            <Button
+                                variant="ghost"
+                                onClick={() => table.resetColumnFilters()}
+                                className="h-8 px-2 lg:px-3"
+                            >
+                                Resetar
+                            </Button>
+                        )}
+                    </div>
+
+                    <MenuModal />
                 </div>
             </div>
             <div className="overflow-hidden rounded-md border">

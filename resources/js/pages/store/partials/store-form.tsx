@@ -409,7 +409,7 @@ function Step2({ form }: StepProps) {
             <div className="space-y-2">
                 <Label>Telefones (até 3)</Label>
                 {data.phones?.map((phone, index) => (
-                    <div key={index} className="flex items-center gap-2">
+                    <div key={index} className="flex items-center gap-2 mr-8">
                         <div className="relative flex-1">
                             <Phone className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
                             <PhoneInput
@@ -449,7 +449,7 @@ function Step2({ form }: StepProps) {
                         className="text-zinc-500"
                         onClick={() => handleAddField('phones')}
                     >
-                        <Plus className="mr-2 size-4" />
+                        <Plus className="size-4" />
                         Adicionar Telefone
                     </Button>
                 )}

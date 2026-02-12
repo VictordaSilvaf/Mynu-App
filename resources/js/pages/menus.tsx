@@ -1,4 +1,3 @@
-import MenuModal from '@/components/menu-modal';
 import { columns } from '@/components/menuTable/columns';
 import { DataTable } from '@/components/menuTable/data-table';
 import AppLayout from '@/layouts/app-layout';

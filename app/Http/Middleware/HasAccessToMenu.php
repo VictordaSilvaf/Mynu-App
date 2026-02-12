@@ -17,7 +17,7 @@ class HasAccessToMenu
     {
         $user = $request->user();
 
-        if (! $user || ! $user->menus()->exists()) {
+        if (! $user || ! $user->store()->exists()) {
             return redirect()
                 ->route('stores.index')
                 ->with('error', 'Você precisa ter uma loja para criar cardápios.');

@@ -8,6 +8,10 @@ use App\Services\Menu\MenuLimitService;
 
 class MenuPolicy
 {
+        public function __construct(
+        private MenuLimitService $menuLimitService
+    ) {}
+
     /**
      * Determine whether the user can view any models.
      */
@@ -29,7 +33,7 @@ class MenuPolicy
      */
     public function create(User $user)
     {
-        return app(MenuLimitService::class)->authorizeCreate($user);
+        return $this->menuLimitService->authorizeCreate($user);
     }
 
     /**

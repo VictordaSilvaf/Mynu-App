@@ -7,10 +7,10 @@ use Illuminate\Auth\Access\AuthorizationException;
 
 class MenuLimitService
 {
-    public function authorizeCreate(User $user): void
+    public function authorizeCreate(User $user)
     {
         if ($user->hasRole('enterprise')) {
-            return;
+            return true;
         }
 
         if ($user->hasRole('pro')) {
@@ -20,11 +20,15 @@ class MenuLimitService
                 );
             }
 
-            return;
+            return true;
         }
 
-        throw new AuthorizationException(
-            'Seu plano atual não permite a criação de cardápios.'
-        );
+        if ($user->menus()->count() >= 1) {
+            throw new AuthorizationException(
+                'Seu plano atual não permite a criação de novos cardápios.'
+            );
+        }
+
+        return true;
     }
 }
