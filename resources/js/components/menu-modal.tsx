@@ -2,6 +2,11 @@ import menus from "@/routes/menus";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
     Drawer,
     DrawerClose,
     DrawerContent,
@@ -13,7 +18,11 @@ import {
 } from "@/components/ui/drawer"
 import { useForm } from "@inertiajs/react";
 
-export default function MenuModal() {
+interface MenuModalProps {
+    storeComplete?: boolean;
+}
+
+export default function MenuModal({ storeComplete = true }: MenuModalProps) {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
     });
@@ -28,9 +37,21 @@ export default function MenuModal() {
     return (
         <div>
             <Drawer direction="right">
-                <DrawerTrigger asChild>
-                    <Button>Adicionar Cardápio</Button>
-                </DrawerTrigger>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <span className="inline-flex">
+                            <DrawerTrigger asChild>
+                                <Button disabled={!storeComplete}>Adicionar Cardápio</Button>
+                            </DrawerTrigger>
+                        </span>
+                    </TooltipTrigger>
+                    {!storeComplete && (
+                        <TooltipContent>
+                            <p>Complete os dados da loja antes de criar um cardápio.</p>
+                            <p className="mt-1 text-muted-foreground text-[10px]">Nome, ao menos um telefone e uma cor.</p>
+                        </TooltipContent>
+                    )}
+                </Tooltip>
                 <DrawerContent>
                     <DrawerHeader>
                         <DrawerTitle>Criar Novo Cardápio</DrawerTitle>

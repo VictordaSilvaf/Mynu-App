@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const phoneRegex = /^\(\d{2}\) \d{5}-\d{4}$/;
+const phoneRegex = /^\(\d{2}\) \d{4,5}-\d{4}$/;
 const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
 const cnpjRegex = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/;
 
@@ -10,7 +10,7 @@ const step1Schema = z.object({
         .min(3, { message: 'O nome da loja deve ter no mínimo 3 caracteres.' }),
     colors: z
         .array(z.string())
-        .min(1, { message: 'Selecione ao menos uma cor.' }),
+        .length(9, { message: 'Selecione as 9 cores (fundo, gradiente header, título, subtítulo, seção, card, texto, preço).' }),
 });
 
 const step2Schema = z.object({

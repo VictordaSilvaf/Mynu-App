@@ -14,6 +14,8 @@ class Store extends Model
     protected $fillable = [
         'user_id',
         'name',
+        'logo_image',
+        'background_image',
         'phones',
         'colors',
         'operating_hours',
@@ -47,5 +49,19 @@ class Store extends Model
     public function visits(): HasMany
     {
         return $this->hasMany(Visit::class);
+    }
+
+    /**
+     * Whether the store has the minimum required data to create menus.
+     */
+    public function isComplete(): bool
+    {
+        $hasName = ! empty(trim((string) $this->name));
+        $phones = $this->phones ?? [];
+        $hasPhone = collect($phones)->contains(fn ($p) => ! empty(trim((string) $p)));
+        $colors = $this->colors ?? [];
+        $hasColor = count($colors) >= 1;
+
+        return $hasName && $hasPhone && $hasColor;
     }
 }

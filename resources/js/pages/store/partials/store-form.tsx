@@ -24,11 +24,13 @@ import {
     ChevronLeft,
     ChevronRight,
     FileText,
+    ImageIcon,
     Instagram,
     Phone,
     Plus,
     PlusCircle,
     Trash2,
+    Upload,
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -38,10 +40,12 @@ import { PhoneInput } from './phone-input';
 
 type StoreFormData = Omit<
     Store,
-    'id' | 'user_id' | 'created_at' | 'updated_at' | 'address'
+    'id' | 'user_id' | 'created_at' | 'updated_at' | 'address' | 'logo_image' | 'background_image'
 > & {
     phones: string[];
     colors: string[];
+    logo_image: File | null;
+    background_image: File | null;
 };
 
 type SubmittedOperatingHours = Array<{
@@ -50,8 +54,13 @@ type SubmittedOperatingHours = Array<{
     close: string;
 }>;
 
-type SubmittedStoreFormData = Omit<StoreFormData, 'operating_hours'> & {
+type SubmittedStoreFormData = Omit<
+    StoreFormData,
+    'operating_hours' | 'logo_image' | 'background_image'
+> & {
     operating_hours: SubmittedOperatingHours;
+    logo_image?: File;
+    background_image?: File;
 };
 
 interface StepProps {
@@ -65,6 +74,166 @@ const steps = [
     { name: 'Horário de Funcionamento', component: Step3 },
 ];
 
+interface MenuColorPreviewProps {
+    colors: string[];
+    storeName: string;
+    logoImageUrl: string | null;
+    backgroundImageUrl: string | null;
+}
+
+const PREVIEW_SECTIONS: Array<{
+    name: string;
+    description: string | null;
+    dishes: Array<{
+        name: string;
+        description: string | null;
+        price: number;
+        promotionalPrice: number | null;
+        hasImage: boolean;
+    }>;
+}> = [
+        {
+            name: 'Entradas',
+            description: 'Para começar bem.',
+            dishes: [
+                { name: 'Bruschetta', description: 'Pão crocante com tomate, manjericão e azeite.', price: 24.9, promotionalPrice: 19.9, hasImage: true },
+                { name: 'Carpaccio', description: 'Fatias finas de carne com rúcula e parmesão.', price: 32, promotionalPrice: null, hasImage: false },
+            ],
+        },
+        {
+            name: 'Pratos principais',
+            description: null,
+            dishes: [
+                { name: 'Filé ao molho', description: 'Filé mignon, batatas e legumes da época.', price: 58, promotionalPrice: 49.9, hasImage: true },
+                { name: 'Risoto de cogumelos', description: 'Arroz arbóreo, cogumelos frescos e parmesão.', price: 42, promotionalPrice: null, hasImage: true },
+                { name: 'Salada Caesar', description: 'Alface, frango grelhado, croutons e molho Caesar.', price: 36, promotionalPrice: null, hasImage: false },
+            ],
+        },
+        {
+            name: 'Sobremesas',
+            description: 'Finalize com doce.',
+            dishes: [
+                { name: 'Brownie', description: 'Brownie de chocolate com sorvete.', price: 22, promotionalPrice: 18, hasImage: true },
+                { name: 'Pudim de leite', description: 'Pudim tradicional com calda de caramelo.', price: 16, promotionalPrice: null, hasImage: false },
+            ],
+        },
+    ];
+
+function formatPreviewPrice(value: number): string {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+}
+
+function MenuColorPreview({ colors, storeName, logoImageUrl, backgroundImageUrl }: Readonly<MenuColorPreviewProps>) {
+    const [cBg, cGrad1, cGrad2, cTitle, cSub, cSection, cCardBg, cCardText, cPrice] = colors.length >= 9
+        ? colors
+        : ['#f8fafc', '#e0e7ff', '#c7d2fe', '#1e293b', '#64748b', '#334155', '#ffffff', '#0f172a', '#059669'];
+
+    const headerStyle = backgroundImageUrl
+        ? {
+            backgroundImage: `linear-gradient(0deg, rgba(255,255,255,0.85) 0%, rgba(248,248,248,0.7) 100%), url(${backgroundImageUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+        }
+        : {
+            background: `linear-gradient(135deg, ${cGrad1} 0%, ${cGrad2} 100%)`,
+        };
+
+    return (
+        <div
+            className="flex w-full flex-1 overflow-hidden rounded-xl border border-border shadow-md"
+            style={{ backgroundColor: cBg }}
+        >
+            <div className="flex min-h-0 flex-1 flex-col">
+                <div
+                    className="relative min-h-[100px] shrink-0 px-3 py-4 text-center sm:min-h-[120px]"
+                    style={{ ...headerStyle, borderBottom: `1px solid ${cTitle}25` }}
+                >
+                    {logoImageUrl && (
+                        <div className="mb-2 flex justify-center">
+                            <img
+                                src={logoImageUrl}
+                                alt=""
+                                className="h-12 w-12 rounded-xl border-2 border-white/80 object-cover shadow sm:h-14 sm:w-14"
+                            />
+                        </div>
+                    )}
+                    <div className="text-sm font-bold truncate drop-shadow-sm" style={{ color: cTitle }}>
+                        {storeName || 'Sua loja'}
+                    </div>
+                    <div className="mt-0.5 text-xs" style={{ color: cSub }}>
+                        Cardápio
+                    </div>
+                </div>
+                <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-3">
+                    {PREVIEW_SECTIONS.map((section) => (
+                        <section key={section.name} className="space-y-2">
+                            <h3 className="text-xs font-semibold" style={{ color: cSection }}>
+                                {section.name}
+                            </h3>
+                            {section.description && (
+                                <p
+                                    className="text-[10px] leading-relaxed opacity-85"
+                                    style={{ color: cSection }}
+                                >
+                                    {section.description}
+                                </p>
+                            )}
+                            <div className="space-y-2">
+                                {section.dishes.map((dish) => (
+                                    <div
+                                        key={dish.name}
+                                        className="flex gap-2 rounded-lg border text-left"
+                                        style={{
+                                            backgroundColor: cCardBg,
+                                            borderColor: `${cCardText}30`,
+                                        }}
+                                    >
+                                        {dish.hasImage ? (
+                                            <div
+                                                className="size-20 shrink-0 rounded-md bg-muted"
+                                                aria-hidden
+                                            />
+                                        ) : (
+                                            <div
+                                                className="size-20 shrink-0 rounded-md bg-muted/60"
+                                                aria-hidden
+                                            />
+                                        )}
+                                        <div className="min-w-0 flex-1 py-1.5 pr-2">
+                                            <div className="text-xs font-medium truncate" style={{ color: cCardText }}>
+                                                {dish.name}
+                                            </div>
+                                            {dish.description && (
+                                                <p
+                                                    className="mt-0.5 line-clamp-2 text-[10px] leading-snug opacity-85"
+                                                    style={{ color: cCardText }}
+                                                >
+                                                    {dish.description}
+                                                </p>
+                                            )}
+                                            <span
+                                                className="mt-1 inline-flex flex-wrap items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold"
+                                                style={{ backgroundColor: `${cPrice}20`, color: cPrice }}
+                                            >
+                                                {dish.promotionalPrice != null && (
+                                                    <span className="font-normal opacity-70 line-through">
+                                                        {formatPreviewPrice(dish.price)}
+                                                    </span>
+                                                )}
+                                                {formatPreviewPrice(dish.promotionalPrice ?? dish.price)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
 interface StoreFormProps {
     store: Store | null;
 }
@@ -73,55 +242,65 @@ interface StoreFormProps {
 export default function StoreForm({ store: storeData }: StoreFormProps) {
     const [step, setStep] = useState(0);
 
-    const form = useForm<StoreFormData>(
-        {
-            name: '',
-            phones: [''],
-            colors: ['#000000'],
-            operating_hours: {},
-            whatsapp: '',
-            instagram: '',
-            document_type: 'cpf',
-            document_number: '',
-        },
-        {
-            transform: (data: StoreFormData): SubmittedStoreFormData => {
-                const cleanedWhatsapp = data.whatsapp
-                    ? data.whatsapp.replace(/\D/g, '')
-                    : '';
-                const transformedWhatsapp = cleanedWhatsapp
-                    ? '+55' + cleanedWhatsapp
-                    : '';
+    const DEFAULT_COLORS_9 = ['#f8fafc', '#e0e7ff', '#c7d2fe', '#1e293b', '#64748b', '#334155', '#ffffff', '#0f172a', '#059669'];
 
-                const transformPhone = (value: string) => {
-                    const cleaned = value.replace(/\D/g, '');
-                    return cleaned ? '+55' + cleaned : '';
-                };
+    const initialData: StoreFormData = {
+        name: '',
+        logo_image: null,
+        background_image: null,
+        phones: [''],
+        colors: [...DEFAULT_COLORS_9],
+        operating_hours: {},
+        whatsapp: '',
+        instagram: '',
+        document_type: 'cpf',
+        document_number: '',
+    };
 
-                const transformedOperatingHours = Object.entries(
-                    data.operating_hours,
-                ).reduce((acc, [day, hours]) => {
-                    const dayKey = day as keyof OperatingHours;
-                    // Only include if isOpen is true and open/close times are provided
-                    if (hours?.isOpen && hours.open && hours.close) {
-                        acc.push({
-                            day: dayKey,
-                            open: hours.open,
-                            close: hours.close,
-                        });
-                    }
-                    return acc;
-                }, [] as SubmittedOperatingHours);
+    const formOptions = {
+        transform: (formData: StoreFormData) => buildSubmitPayload(formData),
+    };
+    const form = (
+        useForm as (
+            data: StoreFormData,
+            options: { transform: (data: StoreFormData) => SubmittedStoreFormData },
+        ) => ReturnType<typeof useForm<StoreFormData>>
+    )(initialData, formOptions);
 
-                return {
-                    ...data,
-                    phones: data.phones.map(transformPhone).filter(Boolean),
-                    whatsapp: transformedWhatsapp,
-                    operating_hours: transformedOperatingHours,
-                } as SubmittedStoreFormData;
-            },
-        },
-    );
+    function buildSubmitPayload(formData: StoreFormData): SubmittedStoreFormData {
+        const cleanedWhatsapp = formData.whatsapp
+            ? formData.whatsapp.replace(/\D/g, '')
+            : '';
+        const transformedWhatsapp = cleanedWhatsapp
+            ? '+55' + cleanedWhatsapp
+            : '';
+        const transformPhone = (value: string) => {
+            const cleaned = value.replace(/\D/g, '');
+            return cleaned ? '+55' + cleaned : '';
+        };
+        const transformedOperatingHours = Object.entries(
+            formData.operating_hours,
+        ).reduce((acc, [day, hours]) => {
+            const dayKey = day as keyof OperatingHours;
+            if (hours?.isOpen && hours.open && hours.close) {
+                acc.push({
+                    day: dayKey,
+                    open: hours.open,
+                    close: hours.close,
+                });
+            }
+            return acc;
+        }, [] as SubmittedOperatingHours);
+        const { logo_image, background_image, ...rest } = formData;
+        return {
+            ...rest,
+            phones: formData.phones.map(transformPhone).filter(Boolean),
+            whatsapp: transformedWhatsapp,
+            operating_hours: transformedOperatingHours,
+            ...(logo_image instanceof File && { logo_image }),
+            ...(background_image instanceof File && { background_image }),
+        } as SubmittedStoreFormData;
+    }
 
     const { data, post, patch, processing, errors, setError, clearErrors } =
         form;
@@ -146,18 +325,19 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
+        const hasFiles = data.logo_image instanceof File || data.background_image instanceof File;
+
         if (storeData) {
             patch(update(storeData.id).url, {
                 onSuccess: () => toast.success('Loja atualizada com sucesso!'),
-
-                onError: () =>
-                    toast.error('Ocorreu um erro ao atualizar a loja.'),
+                onError: () => toast.error('Ocorreu um erro ao atualizar a loja.'),
+                forceFormData: hasFiles,
             });
         } else {
             post(storeRoute().url, {
                 onSuccess: () => toast.success('Loja criada com sucesso!'),
-
                 onError: () => toast.error('Ocorreu um erro ao criar a loja.'),
+                forceFormData: hasFiles,
             });
         }
     };
@@ -167,10 +347,17 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
     useEffect(() => {
         if (!storeData) return;
 
+        const phones =
+            storeData.phones && storeData.phones.length > 0
+                ? storeData.phones
+                : [''];
+
         form.setData({
             name: storeData.name ?? '',
-            phones: storeData.phones ?? [''],
-            colors: storeData.colors ?? ['#000000'],
+            logo_image: null,
+            background_image: null,
+            phones,
+            colors: storeData.colors?.length === 9 ? storeData.colors : ['#f8fafc', '#e0e7ff', '#c7d2fe', '#1e293b', '#64748b', '#334155', '#ffffff', '#0f172a', '#059669'],
             operating_hours: storeData.operating_hours ?? {},
             whatsapp: storeData.whatsapp ?? '',
             instagram: storeData.instagram ?? '',
@@ -272,102 +459,202 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
     );
 }
 
-function Step1({ form }: StepProps) {
+function Step1({ form, store }: StepProps) {
     const { data, setData, errors } = form;
 
-    const handleAddField = (field: 'colors') => {
-        setData(field, [...data[field] ?? [], '#000000']);
-    };
-
-    const handleRemoveField = (field: 'colors', index: number) => {
-        if (data[field]?.length > 1) {
-            const newFields = [...data[field] ?? []];
-
-            newFields.splice(index, 1);
-
-            setData(field, newFields);
-        }
-    };
+    const logoPreview = data.logo_image instanceof File
+        ? URL.createObjectURL(data.logo_image)
+        : store?.logo_image
+            ? `/storage/${store.logo_image}`
+            : null;
+    const backgroundPreview = data.background_image instanceof File
+        ? URL.createObjectURL(data.background_image)
+        : store?.background_image
+            ? `/storage/${store.background_image}`
+            : null;
 
     const handleFieldChange = (
         field: 'colors',
         index: number,
         value: string,
     ) => {
-        const newFields = [...data[field] ?? []];
-
+        const current = data[field] ?? [];
+        const newFields = [...current];
+        const defaultColors = ['#f8fafc', '#e0e7ff', '#c7d2fe', '#1e293b', '#64748b', '#334155', '#ffffff', '#0f172a', '#059669'];
+        while (newFields.length < 9) {
+            newFields.push(defaultColors[newFields.length] ?? '#000000');
+        }
         newFields[index] = value;
-
         setData(field, newFields);
     };
 
+    const defaultColors = ['#f8fafc', '#e0e7ff', '#c7d2fe', '#1e293b', '#64748b', '#334155', '#ffffff', '#0f172a', '#059669'];
+    const colorSections = [
+        { title: 'Página', items: [{ label: 'Fundo da página', index: 0 }] },
+        {
+            title: 'Header do cardápio',
+            items: [
+                { label: 'Gradiente 1', index: 1 },
+                { label: 'Gradiente 2', index: 2 },
+                { label: 'Título (nome da loja)', index: 3 },
+                { label: 'Subtítulo (nome do cardápio)', index: 4 },
+            ],
+        },
+        {
+            title: 'Lista de pratos',
+            items: [
+                { label: 'Título da seção', index: 5 },
+                { label: 'Fundo do card', index: 6 },
+                { label: 'Texto do card', index: 7 },
+                { label: 'Preço', index: 8 },
+            ],
+        },
+    ] as const;
+
     return (
-        <div className="space-y-6">
-            <div className="space-y-2">
-                <Label htmlFor="name">Nome da Loja</Label>
-
-                <div className="relative">
-                    <Building className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-
-                    <Input
-                        id="name"
-                        value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
-                        className="pl-9"
-                        placeholder="Ex: Cantina da Nona"
-                    />
+        <div className="grid gap-6 lg:grid-cols-[1fr,minmax(300px,380px)]">
+            <div className="space-y-6">
+                <div className="space-y-2">
+                    <Label htmlFor="name">Nome da Loja</Label>
+                    <div className="relative">
+                        <Building className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                            id="name"
+                            value={data.name}
+                            onChange={(e) => setData('name', e.target.value)}
+                            className="pl-9"
+                            placeholder="Ex: Cantina da Nona"
+                        />
+                    </div>
+                    <InputError message={errors.name} />
                 </div>
 
-                <InputError message={errors.name} />
+                <div className="grid gap-6 sm:grid-cols-2">
+                    <div className="space-y-2">
+                        <Label>Imagem principal (logo)</Label>
+                        <p className="text-xs text-muted-foreground">Opcional. Exibida no cabeçalho do cardápio público.</p>
+                        {logoPreview ? (
+                            <div className="relative aspect-square max-w-40 overflow-hidden rounded-lg border bg-muted">
+                                <img src={logoPreview} alt="Logo" className="size-full object-cover" />
+                                <div className="absolute inset-x-0 bottom-0 flex gap-1 p-2">
+                                    <label className="flex-1 cursor-pointer">
+                                        <span className="inline-flex items-center justify-center rounded bg-background/90 px-2 py-1 text-xs font-medium text-foreground">
+                                            Trocar
+                                        </span>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={(e) => setData('logo_image', e.target.files?.[0] ?? null)}
+                                        />
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setData('logo_image', null)}
+                                        className="rounded bg-background/90 px-2 py-1 text-xs font-medium text-destructive"
+                                    >
+                                        Remover
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <label className="flex aspect-square max-w-40 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 bg-muted/50 transition-colors hover:border-muted-foreground/50 hover:bg-muted/80">
+                                <Upload className="mb-2 size-8 text-muted-foreground" />
+                                <span className="text-center text-sm text-muted-foreground">Clique para enviar</span>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => setData('logo_image', e.target.files?.[0] ?? null)}
+                                />
+                            </label>
+                        )}
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Imagem de plano de fundo</Label>
+                        <p className="text-xs text-muted-foreground">Opcional. Fundo do cabeçalho do cardápio público.</p>
+                        {backgroundPreview ? (
+                            <div className="relative aspect-video max-w-full overflow-hidden rounded-lg border bg-muted">
+                                <img src={backgroundPreview} alt="Fundo" className="size-full object-cover" />
+                                <div className="absolute inset-x-0 bottom-0 flex gap-1 p-2">
+                                    <label className="flex-1 cursor-pointer">
+                                        <span className="inline-flex items-center justify-center rounded bg-background/90 px-2 py-1 text-xs font-medium text-foreground">
+                                            Trocar
+                                        </span>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={(e) => setData('background_image', e.target.files?.[0] ?? null)}
+                                        />
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setData('background_image', null)}
+                                        className="rounded bg-background/90 px-2 py-1 text-xs font-medium text-destructive"
+                                    >
+                                        Remover
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <label className="flex aspect-video max-w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 bg-muted/50 transition-colors hover:border-muted-foreground/50 hover:bg-muted/80">
+                                <ImageIcon className="mb-2 size-8 text-muted-foreground" />
+                                <span className="text-center text-sm text-muted-foreground">Clique para enviar</span>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => setData('background_image', e.target.files?.[0] ?? null)}
+                                />
+                            </label>
+                        )}
+                    </div>
+                </div>
             </div>
 
-            <div className="space-y-2">
-                <div className="flex items-center justify-between flex-row min-h-8">
-                    <Label>Cores da Loja (até 3)</Label>
-
-                    {data.colors?.length < 3 && (
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="text-zinc-500"
-                            onClick={() => handleAddField('colors')}
-                        >
-                            <PlusCircle className="mr-2 size-4" />
-                            Adicionar Cor
-                        </Button>
-                    )}
-                </div>
-
-                <div className="flex flex-row gap-4">
-                    {data.colors?.map((color, index) => (
-                        <div key={index} className="flex items-center gap-2 relative">
-                            <ColorPicker
-                                color={color}
-                                onChange={(newColor) =>
-                                    handleFieldChange('colors', index, newColor)
-                                }
-                                className="flex-1 transition-all bg-white"
-                            />
-
-                            {data.colors?.length > 1 && (
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() =>
-                                        handleRemoveField('colors', index)
-                                    }
-                                    className='absolute top-0 right-0 w-4 h-4 bg-destructive/20 hover:bg-destructive/30 duration-300 transition-all rounded-full flex items-center justify-center translate-x-1/2 -translate-y-1/2'
-                                >
-                                    <Trash2 className="size-2 text-destructive" />
-                                </Button>
-                            )}
+            <div className="space-y-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-4">
+                    <Label>Cores do cardápio público (obrigatório)</Label>
+                    <InputError message={errors.colors} />
+                    {colorSections.map((section) => (
+                        <div key={section.title} className="rounded-lg border border-border bg-muted/30 p-3">
+                            <p className="mb-3 text-sm font-medium text-foreground">{section.title}</p>
+                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                                {section.items.map(({ label, index }) => (
+                                    <div key={label} className="flex flex-col gap-1.5">
+                                        <span className="text-xs text-muted-foreground">{label}</span>
+                                        <ColorPicker
+                                            color={data.colors?.[index] ?? defaultColors[index]}
+                                            onChange={(newColor) => handleFieldChange('colors', index, newColor)}
+                                            className="w-full transition-all bg-white"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     ))}
                 </div>
 
-                <InputError message={errors.colors} />
+                <div className="lg:sticky lg:top-4 lg:self-start w-full">
+                    <Label className="mb-2 block text-muted-foreground">Preview do cardápio</Label>
+                    <MenuColorPreview
+                        colors={[
+                            data.colors?.[0] ?? defaultColors[0],
+                            data.colors?.[1] ?? defaultColors[1],
+                            data.colors?.[2] ?? defaultColors[2],
+                            data.colors?.[3] ?? defaultColors[3],
+                            data.colors?.[4] ?? defaultColors[4],
+                            data.colors?.[5] ?? defaultColors[5],
+                            data.colors?.[6] ?? defaultColors[6],
+                            data.colors?.[7] ?? defaultColors[7],
+                            data.colors?.[8] ?? defaultColors[8],
+                        ]}
+                        storeName={data.name || 'Nome da loja'}
+                        logoImageUrl={logoPreview}
+                        backgroundImageUrl={backgroundPreview}
+                    />
+                </div>
             </div>
         </div>
     );

@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DishController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\PublicMenuController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\StoreController;
 use Illuminate\Support\Facades\Route;
@@ -28,10 +29,14 @@ require __DIR__.'/payment.php';
 // Subscription Routes
 require __DIR__.'/subscription.php';
 
+Route::get('cardapio/{menu}', [PublicMenuController::class, 'show'])->name('public.menu.show');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 
     Route::post('menus/reorder', [MenuController::class, 'reorder'])->name('menus.reorder')->middleware(['hasAccessToMenu']);
+
+    Route::post('menus/{menu}/duplicate', [MenuController::class, 'duplicate'])->name('menus.duplicate')->middleware(['hasAccessToMenu']);
 
     Route::resource('menus', MenuController::class)->middleware(['hasAccessToMenu'])->names([
         'index' => 'menus.index',

@@ -9,7 +9,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { store } from '@/routes/stores';
 import { Card, CardContent } from '@/components/ui/card';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { LayoutGrid, Table as TableIcon } from 'lucide-react';
 import {
     DndContext,
@@ -38,11 +38,16 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface MenusProps extends PageProps {
     menus: Menu[];
     hasStore: boolean;
+    storeComplete?: boolean;
 }
 
-export default function Menus({ menus: menuData, hasStore }: MenusProps) {
+export default function Menus({ menus: menuData, hasStore, storeComplete = true }: MenusProps) {
     const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid')
     const [items, setItems] = useState<Menu[]>(menuData)
+
+    React.useEffect(() => {
+        setItems(menuData)
+    }, [menuData])
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -111,7 +116,7 @@ export default function Menus({ menus: menuData, hasStore }: MenusProps) {
                             <TableIcon className="h-4 w-4" />
                         </Button>
                     </div>
-                    <MenuModal />
+                    <MenuModal storeComplete={storeComplete} />
                 </div>
 
                 {viewMode === 'table' ? (

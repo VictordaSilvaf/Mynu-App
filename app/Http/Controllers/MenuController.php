@@ -26,6 +26,7 @@ class MenuController extends Controller
         return Inertia::render('menus', [
             'menus' => $menus,
             'hasStore' => true,
+            'storeComplete' => $request->user()->store->isComplete(),
         ]);
     }
 
@@ -37,6 +38,12 @@ class MenuController extends Controller
             return redirect()->route('stores.index');
         }
 
+        $store = $request->user()->store;
+        if (! $store->isComplete()) {
+            return redirect()->route('menus.index')
+                ->with('error', 'Complete os dados da loja antes de criar um cardápio.');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
         ]);
@@ -46,7 +53,7 @@ class MenuController extends Controller
         return redirect()->route('menus.index');
     }
 
-    public function show(Menu $menu)
+    public function show(Request $request, Menu $menu)
     {
         $this->authorize('view', $menu);
 
@@ -54,8 +61,11 @@ class MenuController extends Controller
             'sections' => fn ($query) => $query->with('dishes')->orderBy('order'),
         ]);
 
+        $canEditSections = $request->user()->hasRole('pro') || $request->user()->hasRole('enterprise');
+
         return Inertia::render('menus/show', [
             'menu' => $menu,
+            'canEditSections' => $canEditSections,
         ]);
     }
 
@@ -80,6 +90,43 @@ class MenuController extends Controller
         $menu->delete();
 
         return redirect()->route('menus.index');
+    }
+
+    public function duplicate(Menu $menu): RedirectResponse
+    {
+        $this->authorize('update', $menu);
+
+        $store = $menu->store;
+        $newMenu = $store->menus()->create([
+            'name' => $menu->name.' (cópia)',
+            'is_active' => false,
+            'order' => $store->menus()->max('order') + 1,
+        ]);
+
+        foreach ($menu->sections()->orderBy('order')->get() as $section) {
+            $newSection = $newMenu->sections()->create([
+                'name' => $section->name,
+                'description' => $section->description,
+                'order' => $section->order,
+                'is_active' => $section->is_active,
+            ]);
+
+            foreach ($section->dishes()->orderBy('order')->get() as $dish) {
+                $newSection->dishes()->create([
+                    'store_id' => $store->id,
+                    'name' => $dish->name,
+                    'description' => $dish->description,
+                    'price' => $dish->price,
+                    'promotional_price' => $dish->promotional_price,
+                    'image' => $dish->image,
+                    'order' => $dish->order,
+                    'is_active' => $dish->is_active,
+                    'is_available' => $dish->is_available,
+                ]);
+            }
+        }
+
+        return redirect()->route('menus.show', $newMenu);
     }
 
     public function reorder(Request $request): RedirectResponse

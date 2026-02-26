@@ -2,13 +2,29 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Menu as MenuType, type PageProps, type Section } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { Plus, ArrowLeft, Settings } from 'lucide-react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Plus, ArrowLeft, Settings, Lock, Eye, EyeOff, Trash2, Pencil } from 'lucide-react';
 import { SectionCard } from '@/components/sections/section-card';
 import { SectionModal } from '@/components/sections/section-modal';
-import { useState } from 'react';
-import menus from '@/routes/menus';
+import { useState, useEffect } from 'react';
+import menus, { destroy as menusDestroy, update as menusUpdate, index as menusIndex } from '@/routes/menus';
 import {
     DndContext,
     closestCenter,
@@ -28,11 +44,25 @@ import { reorder as sectionsReorder } from '@/routes/sections';
 
 interface ShowMenuProps extends PageProps {
     menu: MenuType;
+    canEditSections?: boolean;
 }
 
-export default function ShowMenu({ menu }: ShowMenuProps) {
+export default function ShowMenu({ menu, canEditSections = false }: Readonly<ShowMenuProps>) {
     const [sectionModalOpen, setSectionModalOpen] = useState(false);
     const [sections, setSections] = useState<Section[]>(menu.sections || []);
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [menuName, setMenuName] = useState(menu.name);
+    const [isActive, setIsActive] = useState(!!menu.is_active);
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setSections(menu.sections || []);
+        setMenuName(menu.name);
+        setIsActive(!!menu.is_active);
+    }, [menu.sections, menu.name, menu.is_active]);
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -66,6 +96,50 @@ export default function ShowMenu({ menu }: ShowMenuProps) {
         });
     };
 
+    const handleToggleActive = (nextActive: boolean): void => {
+        setIsUpdating(true);
+
+        router.put(
+            menusUpdate(menu.id).url,
+            { name: menuName, is_active: nextActive },
+            {
+                preserveScroll: true,
+                onFinish: () => setIsUpdating(false),
+                onSuccess: () => setIsActive(nextActive),
+            },
+        );
+    };
+
+    const handleSaveName = (): void => {
+        if (!menuName.trim()) {
+            return;
+        }
+
+        setIsUpdating(true);
+
+        router.put(
+            menusUpdate(menu.id).url,
+            { name: menuName.trim(), is_active: isActive },
+            {
+                preserveScroll: true,
+                onFinish: () => setIsUpdating(false),
+                onSuccess: () => setEditDialogOpen(false),
+            },
+        );
+    };
+
+    const handleDelete = (): void => {
+        setIsDeleting(true);
+
+        router.delete(menusDestroy(menu.id).url, {
+            onSuccess: () => router.visit(menusIndex().url),
+            onFinish: () => {
+                setIsDeleting(false);
+                setDeleteDialogOpen(false);
+            },
+        });
+    };
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Menus',
@@ -80,11 +154,20 @@ export default function ShowMenu({ menu }: ShowMenuProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Menu: ${menu.name}`} />
-            
+
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-6">
+                {!canEditSections && (
+                    <Alert>
+                        <Lock className="size-4" />
+                        <AlertTitle>Recurso dos planos Pro e Enterprise</AlertTitle>
+                        <AlertDescription>
+                            Crie sessões e pratos apenas nos planos Pro ou Enterprise. Faça upgrade para desbloquear.
+                        </AlertDescription>
+                    </Alert>
+                )}
                 {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
+                <div className="flex items-center justify-between flex-col md:flex-row">
+                    <div className="flex items-center gap-4 w-full">
                         <Link href={menus.index().url}>
                             <Button variant="outline" size="icon">
                                 <ArrowLeft className="size-4" />
@@ -102,12 +185,47 @@ export default function ShowMenu({ menu }: ShowMenuProps) {
                             </p>
                         </div>
                     </div>
-                    
-                    <div className="flex items-center gap-2">
-                        <Button variant="outline" size="icon">
-                            <Settings className="size-4" />
-                        </Button>
-                        <Button onClick={() => setSectionModalOpen(true)}>
+
+                    <div className="flex items-center gap-2 mt-2 w-full justify-end">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild className='p-3'>
+                                <Button variant="outline" size="icon" className=''>
+                                    <Settings className="size-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                    onClick={() => setEditDialogOpen(true)}
+                                >
+                                    <Pencil className="mr-2 size-4" />
+                                    Editar nome
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => handleToggleActive(!isActive)}
+                                    disabled={isUpdating}
+                                >
+                                    {isActive ? (
+                                        <>
+                                            <EyeOff className="mr-2 size-4" />
+                                            Desativar cardápio
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Eye className="mr-2 size-4" />
+                                            Ativar cardápio
+                                        </>
+                                    )}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => setDeleteDialogOpen(true)}
+                                    className="text-destructive"
+                                >
+                                    <Trash2 className="mr-2 size-4" />
+                                    Excluir cardápio
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        <Button onClick={() => setSectionModalOpen(true)} disabled={!canEditSections} className='w-full md:w-auto'>
                             <Plus className="size-4" />
                             Nova Seção
                         </Button>
@@ -127,7 +245,7 @@ export default function ShowMenu({ menu }: ShowMenuProps) {
                         >
                             <div className="grid gap-6">
                                 {sections.map((section) => (
-                                    <SectionCard key={section.id} section={section} menuId={menu.id} />
+                                    <SectionCard key={section.id} section={section} menuId={menu.id} canEditSections={canEditSections} />
                                 ))}
                             </div>
                         </SortableContext>
@@ -140,9 +258,10 @@ export default function ShowMenu({ menu }: ShowMenuProps) {
                                 <p className="text-sm text-muted-foreground mt-2">
                                     Comece criando seções para organizar seu cardápio
                                 </p>
-                                <Button 
+                                <Button
                                     className="mt-4"
                                     onClick={() => setSectionModalOpen(true)}
+                                    disabled={!canEditSections}
                                 >
                                     <Plus className="mr-2 size-4" />
                                     Criar primeira seção
@@ -153,11 +272,76 @@ export default function ShowMenu({ menu }: ShowMenuProps) {
                 )}
             </div>
 
-            <SectionModal 
+            <SectionModal
                 open={sectionModalOpen}
                 onOpenChange={setSectionModalOpen}
                 menuId={menu.id}
             />
+
+            {/* Editar nome do cardápio */}
+            <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Editar cardápio</DialogTitle>
+                        <DialogDescription>
+                            Atualize o nome do cardápio. Você pode ativar ou desativar o cardápio pelo menu de configurações.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-3">
+                        <label className="flex flex-col gap-1 text-sm">
+                            <span className="font-medium">Nome do cardápio</span>
+                            <Input
+                                value={menuName}
+                                onChange={(event) => setMenuName(event.target.value)}
+                                placeholder="Digite o nome do cardápio"
+                            />
+                        </label>
+                    </div>
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => setEditDialogOpen(false)}
+                            disabled={isUpdating}
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={handleSaveName}
+                            disabled={isUpdating || !menuName.trim()}
+                        >
+                            {isUpdating ? 'Salvando...' : 'Salvar'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Excluir cardápio */}
+            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Excluir cardápio</DialogTitle>
+                        <DialogDescription>
+                            Tem certeza que deseja excluir o cardápio &quot;{menu.name}&quot;? Essa ação não pode ser desfeita.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => setDeleteDialogOpen(false)}
+                            disabled={isDeleting}
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={handleDelete}
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? 'Excluindo...' : 'Excluir'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </AppLayout>
     );
 }

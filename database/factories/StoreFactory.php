@@ -19,9 +19,9 @@ class StoreFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'name' => $this->faker->company,
+            'name' => $this->faker->words(2, true),
             'phones' => ['(11) 9'.$this->faker->numerify('########')],
-            'colors' => [$this->faker->hexColor],
+            'colors' => array_map(fn () => $this->faker->hexColor(), array_fill(0, 9, null)),
             'operating_hours' => [],
             'whatsapp' => '(11) 9'.$this->faker->numerify('########'),
             'instagram' => $this->faker->userName,

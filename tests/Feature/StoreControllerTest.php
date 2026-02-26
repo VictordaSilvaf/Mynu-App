@@ -22,9 +22,9 @@ test('it creates a store for the authenticated user', function () {
 
     $storeData = [
         'name' => 'My Awesome Store',
-        'phones' => ['123456789'],
-        'colors' => ['#ffffff'],
-        'whatsapp' => '+1234567890',
+        'phones' => ['+5511999998888'],
+        'colors' => ['#f8fafc', '#e0e7ff', '#c7d2fe', '#1e293b', '#64748b', '#334155', '#ffffff', '#0f172a', '#059669'],
+        'whatsapp' => '+5511999998888',
         'instagram' => 'myawesomestore',
     ];
 
@@ -44,9 +44,9 @@ test('it updates the store for the authenticated user', function () {
 
     $updatedStoreData = [
         'name' => 'My Updated Store',
-        'phones' => ['987654321'],
-        'colors' => ['#000000'],
-        'whatsapp' => '+19876543210',
+        'phones' => ['+5511888887777'],
+        'colors' => ['#f8fafc', '#e0e7ff', '#c7d2fe', '#1e293b', '#64748b', '#334155', '#ffffff', '#0f172a', '#059669'],
+        'whatsapp' => '+5511888887777',
         'instagram' => 'myupdatedstore',
     ];
 
@@ -72,6 +72,9 @@ test('it validates the request data', function () {
     $response = $this->post(route('stores.store'), ['colors' => ['1', '2', '3', '4']]);
     $response->assertSessionHasErrors('colors');
 
+    $response = $this->post(route('stores.store'), ['colors' => ['#fff', '#000']]);
+    $response->assertSessionHasErrors('colors');
+
     $response = $this->post(route('stores.store'), ['whatsapp' => 'invalid-number']);
     $response->assertSessionHasErrors('whatsapp');
 });
@@ -83,7 +86,10 @@ test('a user can only update their own store', function () {
     $user2 = User::factory()->create();
     $this->actingAs($user2);
 
-    $response = $this->put(route('stores.update', $store1->id), ['name' => 'New Name']);
+    $response = $this->put(route('stores.update', $store1->id), [
+        'name' => 'New Name',
+        'colors' => ['#f8fafc', '#e0e7ff', '#c7d2fe', '#1e293b', '#64748b', '#334155', '#ffffff', '#0f172a', '#059669'],
+    ]);
 
     $response->assertStatus(404);
 });

@@ -17,18 +17,23 @@ class Dish extends Model
         'name',
         'description',
         'price',
+        'promotional_price',
         'image',
         'order',
         'is_active',
         'is_available',
     ];
 
-    protected $casts = [
-        'price' => 'decimal:2',
-        'is_active' => 'boolean',
-        'is_available' => 'boolean',
-        'order' => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'price' => 'decimal:2',
+            'promotional_price' => 'decimal:2',
+            'is_active' => 'boolean',
+            'is_available' => 'boolean',
+            'order' => 'integer',
+        ];
+    }
 
     public function section(): BelongsTo
     {

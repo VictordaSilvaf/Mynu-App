@@ -24,9 +24,10 @@ import { SectionModal } from './section-modal';
 interface SectionCardProps {
     section: Section;
     menuId: number;
+    canEditSections?: boolean;
 }
 
-export function SectionCard({ section, menuId }: SectionCardProps) {
+export function SectionCard({ section, menuId, canEditSections = false }: SectionCardProps) {
     const [dishModalOpen, setDishModalOpen] = useState(false);
     const [sectionModalOpen, setSectionModalOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -74,12 +75,13 @@ export function SectionCard({ section, menuId }: SectionCardProps) {
         <>
             <Card ref={setNodeRef} style={style}>
                 <CardHeader>
-                    <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-3 flex-1">
+                    <div className="flex items-start justify-between flex-col sm:flex-row flex-1 gap-2">
+                        <div className="flex items-start gap-3 flex-1 justify-between">
                             <Button
                                 variant="ghost"
                                 size="icon"
                                 className="cursor-move mt-1"
+                                disabled={!canEditSections}
                                 {...attributes}
                                 {...listeners}
                             >
@@ -87,12 +89,12 @@ export function SectionCard({ section, menuId }: SectionCardProps) {
                             </Button>
                             <div className="flex-1">
                                 <div className="flex items-center gap-2">
-                                    <CardTitle className="text-xl">{section.name}</CardTitle>
+                                    <CardTitle className="text-xl flex-1">{section.name}</CardTitle>
                                     <div className="flex items-center gap-2">
                                         <Switch
                                             checked={section.is_active}
                                             onCheckedChange={handleToggle}
-                                            disabled={isUpdating}
+                                            disabled={isUpdating || !canEditSections}
                                             size="sm"
                                         />
                                         <span className="text-xs text-muted-foreground">
@@ -107,11 +109,13 @@ export function SectionCard({ section, menuId }: SectionCardProps) {
                                 )}
                             </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-1 justify-end w-full">
                             <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => setSectionModalOpen(true)}
+                                disabled={!canEditSections}
+                                className='flex-1 sm:flex-none w-full sm:w-auto'
                             >
                                 <Edit className="mr-2 size-4" />
                                 Editar
@@ -120,6 +124,7 @@ export function SectionCard({ section, menuId }: SectionCardProps) {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => setDeleteDialogOpen(true)}
+                                disabled={!canEditSections}
                             >
                                 <Trash2 className="size-4" />
                             </Button>
@@ -129,9 +134,9 @@ export function SectionCard({ section, menuId }: SectionCardProps) {
 
                 <CardContent>
                     {section.dishes && section.dishes.length > 0 ? (
-                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             {section.dishes.map((dish) => (
-                                <DishCard key={dish.id} dish={dish} />
+                                <DishCard key={dish.id} dish={dish} canEditSections={canEditSections} />
                             ))}
                         </div>
                     ) : (
@@ -143,6 +148,7 @@ export function SectionCard({ section, menuId }: SectionCardProps) {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => setDishModalOpen(true)}
+                                disabled={!canEditSections}
                             >
                                 <Plus className="mr-2 size-4" />
                                 Adicionar prato
@@ -155,6 +161,7 @@ export function SectionCard({ section, menuId }: SectionCardProps) {
                             variant="outline"
                             className="w-full mt-4"
                             onClick={() => setDishModalOpen(true)}
+                            disabled={!canEditSections}
                         >
                             <Plus className="mr-2 size-4" />
                             Adicionar prato

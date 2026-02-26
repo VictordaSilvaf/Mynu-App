@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { ColumnDef } from "@tanstack/react-table"
-import { Eye, MoreHorizontal, Pencil, Trash2, GripVertical } from "lucide-react"
+import { Eye, MoreHorizontal, Pencil, Trash2, GripVertical, Copy, ExternalLink, EyeOff } from "lucide-react"
 import { router } from "@inertiajs/react"
 
 import { Button } from "@/components/ui/button"
@@ -26,19 +26,28 @@ import { Menu } from "@/types"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
-import { index as menusIndex, show as menusShow, destroy as menusDestroy, update as menusUpdate } from "@/routes/menus"
+import { index as menusIndex, show as menusShow, destroy as menusDestroy, update as menusUpdate, duplicate as menusDuplicate } from "@/routes/menus"
 
 function ActionsCell({ menu }: { menu: Menu }) {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
+    const [isDuplicating, setIsDuplicating] = useState(false)
 
     const handleDelete = () => {
         setIsDeleting(true)
         router.delete(menusDestroy(menu.id).url, {
+            onSuccess: () => router.visit(menusIndex().url),
             onFinish: () => {
                 setIsDeleting(false)
                 setDeleteDialogOpen(false)
             },
+        })
+    }
+
+    const handleDuplicate = () => {
+        setIsDuplicating(true)
+        router.post(menusDuplicate(menu.id).url, {}, {
+            onFinish: () => setIsDuplicating(false),
         })
     }
 
@@ -53,11 +62,21 @@ function ActionsCell({ menu }: { menu: Menu }) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                    <DropdownMenuItem
-                        onClick={() => router.visit(menusShow(menu.id).url)}
-                    >
+                    <DropdownMenuItem onClick={() => router.visit(menusShow(menu.id).url)}>
                         <Eye className="mr-2 h-4 w-4" />
                         Ver detalhes
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.visit(menusShow(menu.id).url)}>
+                        <Pencil className="mr-2 h-4 w-4" />
+                        Editar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleDuplicate} disabled={isDuplicating}>
+                        <Copy className="mr-2 h-4 w-4" />
+                        {isDuplicating ? 'Duplicando...' : 'Duplicar'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => window.open(`/cardapio/${menu.id}`, '_blank', 'noopener,noreferrer')}>
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        Visualizar página pública
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem

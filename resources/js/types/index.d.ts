@@ -139,6 +139,7 @@ export type Dish = {
   name: string
   description?: string
   price: number
+  promotional_price?: number | null
   image?: string
   order: number
   is_active: boolean
@@ -230,6 +231,8 @@ export interface Store {
     id: number;
     user_id: number;
     name: string;
+    logo_image: string | null;
+    background_image: string | null;
     phones: string[];
     colors: string[];
     operating_hours: OperatingHours;

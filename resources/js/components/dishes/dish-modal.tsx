@@ -17,14 +17,15 @@ interface DishModalProps {
     dish?: Dish;
 }
 
-export function DishModal({ open, onOpenChange, sectionId, dish }: DishModalProps) {
+export function DishModal({ open, onOpenChange, sectionId, dish }: Readonly<DishModalProps>) {
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, put, processing, errors, reset } = useForm({
         section_id: sectionId,
         name: dish?.name || '',
         description: dish?.description || '',
         price: dish?.price || 0,
+        promotional_price: dish?.promotional_price ?? '',
         image: null as File | null,
         order: dish?.order || 0,
         is_active: dish?.is_active ?? true,
@@ -38,6 +39,7 @@ export function DishModal({ open, onOpenChange, sectionId, dish }: DishModalProp
                 name: dish.name,
                 description: dish.description || '',
                 price: dish.price,
+                promotional_price: dish.promotional_price ?? '',
                 image: null,
                 order: dish.order,
                 is_active: dish.is_active,
@@ -74,8 +76,9 @@ export function DishModal({ open, onOpenChange, sectionId, dish }: DishModalProp
         e.preventDefault();
 
         const url = dish ? dishes.update(dish.id).url : dishes.store().url;
+        const submit = dish ? put : post;
         
-        post(url, {
+        submit(url, {
             onSuccess: () => {
                 onOpenChange(false);
                 reset();
@@ -162,6 +165,23 @@ export function DishModal({ open, onOpenChange, sectionId, dish }: DishModalProp
                                 placeholder="0.00"
                             />
                             <InputError message={errors.price} />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="promotional_price">Preço promocional (R$)</Label>
+                            <Input
+                                id="promotional_price"
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                value={data.promotional_price === '' ? '' : data.promotional_price}
+                                onChange={(e) => {
+                                    const v = e.target.value;
+                                    setData('promotional_price', v === '' ? '' : parseFloat(v) || 0);
+                                }}
+                                placeholder="Opcional"
+                            />
+                            <InputError message={errors.promotional_price} />
                         </div>
 
                         <div className="space-y-2">

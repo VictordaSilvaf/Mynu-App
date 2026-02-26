@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Switch } from "@/components/ui/switch"
-import { Eye, MoreVertical, Pencil, Trash2, GripVertical } from "lucide-react"
+import { Eye, MoreVertical, Pencil, Trash2, GripVertical, Copy, ExternalLink, EyeOff } from "lucide-react"
 import { router } from "@inertiajs/react"
-import { show as menusShow, destroy as menusDestroy, update as menusUpdate } from "@/routes/menus"
+import { show as menusShow, destroy as menusDestroy, update as menusUpdate, duplicate as menusDuplicate, index as menusIndex } from "@/routes/menus"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 
@@ -20,6 +20,7 @@ export function MenuCard({ menu }: MenuCardProps) {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
     const [isUpdating, setIsUpdating] = useState(false)
+    const [isDuplicating, setIsDuplicating] = useState(false)
 
     const {
         attributes,
@@ -51,6 +52,7 @@ export function MenuCard({ menu }: MenuCardProps) {
     const handleDelete = () => {
         setIsDeleting(true)
         router.delete(menusDestroy(menu.id).url, {
+            onSuccess: () => router.visit(menusIndex().url),
             onFinish: () => {
                 setIsDeleting(false)
                 setDeleteDialogOpen(false)
@@ -60,6 +62,33 @@ export function MenuCard({ menu }: MenuCardProps) {
 
     const handleView = () => {
         router.visit(menusShow(menu.id).url)
+    }
+
+    const handleEdit = () => {
+        router.visit(menusShow(menu.id).url)
+    }
+
+    const handleDuplicate = () => {
+        setIsDuplicating(true)
+        router.post(menusDuplicate(menu.id).url, {}, {
+            onFinish: () => setIsDuplicating(false),
+        })
+    }
+
+    const handleTogglePublish = (checked: boolean) => {
+        setIsUpdating(true)
+        router.put(
+            menusUpdate(menu.id).url,
+            { is_active: checked },
+            {
+                preserveScroll: true,
+                onFinish: () => setIsUpdating(false),
+            }
+        )
+    }
+
+    const handleViewPublic = () => {
+        window.open(`/cardapio/${menu.id}`, '_blank', 'noopener,noreferrer')
     }
 
     const handleCardClick = () => {
@@ -102,12 +131,37 @@ export function MenuCard({ menu }: MenuCardProps) {
                                     <MoreVertical className="h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={handleView}>
+                            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleView(); }}>
                                     <Eye className="mr-2 h-4 w-4" />
                                     Visualizar
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}>
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEdit(); }}>
+                                    <Pencil className="mr-2 h-4 w-4" />
+                                    Editar
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDuplicate(); }} disabled={isDuplicating}>
+                                    <Copy className="mr-2 h-4 w-4" />
+                                    {isDuplicating ? 'Duplicando...' : 'Duplicar'}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleTogglePublish(!menu.is_active); }} disabled={isUpdating}>
+                                    {menu.is_active ? (
+                                        <>
+                                            <EyeOff className="mr-2 h-4 w-4" />
+                                            Despublicar
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Eye className="mr-2 h-4 w-4" />
+                                            Publicar
+                                        </>
+                                    )}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleViewPublic(); }}>
+                                    <ExternalLink className="mr-2 h-4 w-4" />
+                                    Visualizar página pública
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setDeleteDialogOpen(true); }} className="text-destructive">
                                     <Trash2 className="mr-2 h-4 w-4" />
                                     Excluir
                                 </DropdownMenuItem>
@@ -133,7 +187,7 @@ export function MenuCard({ menu }: MenuCardProps) {
             </Card>
 
             <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                <DialogContent>
+                <DialogContent onClick={(e) => e.stopPropagation()}>
                     <DialogHeader>
                         <DialogTitle>Confirmar exclusão</DialogTitle>
                         <DialogDescription>

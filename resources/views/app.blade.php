@@ -51,16 +51,21 @@
     <meta name="apple-mobile-web-app-title" content="Mynu" />
     <meta name="format-detection" content="telephone=no" />
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     {{-- Lógica de Tema Otimizada --}}
     <script>
-        (function () {
-            const appearance = '{{ $appearance ?? "light" }}';
+        (function() {
+            const appearance = '{{ $appearance ?? 'light' }}';
             const html = document.documentElement;
 
             const applyTheme = (isDark) => {
                 html.classList.toggle('dark', isDark);
                 // Opcional: Atualiza a cor da barra de navegação via JS para consistência total
-                document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#09090b' : '#ffffff');
+                document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#09090b' :
+                    '#ffffff');
             };
 
             if (appearance === 'system') {
@@ -114,7 +119,10 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-29Y2BL66CR"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
         gtag('js', new Date());
 
         gtag('config', 'G-29Y2BL66CR');

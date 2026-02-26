@@ -68,7 +68,7 @@ export function SectionModal({ open, onOpenChange, menuId, section }: SectionMod
                         {section ? 'Editar Seção' : 'Nova Seção'}
                     </DialogTitle>
                     <DialogDescription>
-                        {section 
+                        {section
                             ? 'Atualize as informações da seção do cardápio.'
                             : 'Adicione uma nova seção ao seu cardápio.'
                         }

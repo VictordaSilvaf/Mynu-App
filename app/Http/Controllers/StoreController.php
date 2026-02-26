@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class StoreController extends Controller
@@ -20,8 +21,10 @@ class StoreController extends Controller
         if (! $store) {
             $store = $user->store()->create([
                 'name' => null,
+                'logo_image' => null,
+                'background_image' => null,
                 'phones' => [],
-                'colors' => ['#000000'],
+                'colors' => ['#f8fafc', '#e0e7ff', '#c7d2fe', '#1e293b', '#64748b', '#334155', '#ffffff', '#0f172a', '#059669'],
                 'operating_hours' => [],
                 'whatsapp' => null,
                 'instagram' => null,
@@ -76,7 +79,23 @@ class StoreController extends Controller
     {
         $store = $request->user()->store()->findOrFail($id);
 
-        $store->update($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('logo_image')) {
+            if ($store->logo_image) {
+                Storage::disk('public')->delete($store->logo_image);
+            }
+            $data['logo_image'] = $request->file('logo_image')->store('stores', 'public');
+        }
+
+        if ($request->hasFile('background_image')) {
+            if ($store->background_image) {
+                Storage::disk('public')->delete($store->background_image);
+            }
+            $data['background_image'] = $request->file('background_image')->store('stores', 'public');
+        }
+
+        $store->update($data);
 
         return redirect()->route('stores.index');
     }
