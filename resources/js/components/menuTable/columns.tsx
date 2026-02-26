@@ -35,7 +35,7 @@ function ActionsCell({ menu }: { menu: Menu }) {
 
     const handleDelete = () => {
         setIsDeleting(true)
-        router.delete(menusDestroy(menu.id).url, {
+        router.delete(menusDestroy(menu.slug).url, {
             onSuccess: () => router.visit(menusIndex().url),
             onFinish: () => {
                 setIsDeleting(false)
@@ -46,7 +46,7 @@ function ActionsCell({ menu }: { menu: Menu }) {
 
     const handleDuplicate = () => {
         setIsDuplicating(true)
-        router.post(menusDuplicate(menu.id).url, {}, {
+        router.post(menusDuplicate(menu.slug).url, {}, {
             onFinish: () => setIsDuplicating(false),
         })
     }
@@ -62,11 +62,11 @@ function ActionsCell({ menu }: { menu: Menu }) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                    <DropdownMenuItem onClick={() => router.visit(menusShow(menu.id).url)}>
+                    <DropdownMenuItem onClick={() => router.visit(menusShow(menu.slug).url)}>
                         <Eye className="mr-2 h-4 w-4" />
                         Ver detalhes
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => router.visit(menusShow(menu.id).url)}>
+                    <DropdownMenuItem onClick={() => router.visit(menusShow(menu.slug).url)}>
                         <Pencil className="mr-2 h-4 w-4" />
                         Editar
                     </DropdownMenuItem>
@@ -74,7 +74,7 @@ function ActionsCell({ menu }: { menu: Menu }) {
                         <Copy className="mr-2 h-4 w-4" />
                         {isDuplicating ? 'Duplicando...' : 'Duplicar'}
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => window.open(`/cardapio/${menu.id}`, '_blank', 'noopener,noreferrer')}>
+                    <DropdownMenuItem onClick={() => window.open(`/cardapio/${menu.slug}`, '_blank', 'noopener,noreferrer')}>
                         <ExternalLink className="mr-2 h-4 w-4" />
                         Visualizar página pública
                     </DropdownMenuItem>
@@ -142,7 +142,7 @@ export const columns: ColumnDef<Menu>[] = [
             const menu = row.original
             return (
                 <button
-                    onClick={() => router.visit(menusShow(menu.id).url)}
+                    onClick={() => router.visit(menusShow(menu.slug).url)}
                     className="text-left font-medium hover:underline"
                 >
                     {menu.name}
@@ -162,7 +162,7 @@ export const columns: ColumnDef<Menu>[] = [
             const handleToggle = (checked: boolean) => {
                 setIsUpdating(true)
                 router.put(
-                    menusUpdate(menu.id).url,
+                    menusUpdate(menu.slug).url,
                     { is_active: checked },
                     {
                         preserveScroll: true,

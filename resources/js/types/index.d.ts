@@ -110,6 +110,7 @@ export type MenuCategory = {
 export type Menu = {
   id: number
   name: string
+  slug: string
   is_active: boolean
   user_id: number
   order: number

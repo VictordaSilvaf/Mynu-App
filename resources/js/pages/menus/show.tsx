@@ -20,7 +20,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Plus, ArrowLeft, Settings, Lock, Eye, EyeOff, Trash2, Pencil } from 'lucide-react';
+import { Plus, ArrowLeft, Settings, Lock, Eye, EyeOff, Trash2, Pencil, ExternalLink } from 'lucide-react';
 import { SectionCard } from '@/components/sections/section-card';
 import { SectionModal } from '@/components/sections/section-modal';
 import { useState, useEffect } from 'react';
@@ -100,7 +100,7 @@ export default function ShowMenu({ menu, canEditSections = false }: Readonly<Sho
         setIsUpdating(true);
 
         router.put(
-            menusUpdate(menu.id).url,
+            menusUpdate(menu.slug).url,
             { name: menuName, is_active: nextActive },
             {
                 preserveScroll: true,
@@ -118,7 +118,7 @@ export default function ShowMenu({ menu, canEditSections = false }: Readonly<Sho
         setIsUpdating(true);
 
         router.put(
-            menusUpdate(menu.id).url,
+            menusUpdate(menu.slug).url,
             { name: menuName.trim(), is_active: isActive },
             {
                 preserveScroll: true,
@@ -131,7 +131,7 @@ export default function ShowMenu({ menu, canEditSections = false }: Readonly<Sho
     const handleDelete = (): void => {
         setIsDeleting(true);
 
-        router.delete(menusDestroy(menu.id).url, {
+        router.delete(menusDestroy(menu.slug).url, {
             onSuccess: () => router.visit(menusIndex().url),
             onFinish: () => {
                 setIsDeleting(false);
@@ -147,7 +147,7 @@ export default function ShowMenu({ menu, canEditSections = false }: Readonly<Sho
         },
         {
             title: menu.name,
-            href: menus.show(menu.id).url,
+            href: menus.show(menu.slug).url,
         },
     ];
 
@@ -187,6 +187,13 @@ export default function ShowMenu({ menu, canEditSections = false }: Readonly<Sho
                     </div>
 
                     <div className="flex items-center gap-2 mt-2 w-full justify-end">
+                        <Button
+                            variant="outline"
+                            onClick={() => window.open(`/cardapio/${menu.slug}`, '_blank', 'noopener,noreferrer')}
+                        >
+                            <ExternalLink className="mr-2 size-4" />
+                            Ver cardápio
+                        </Button>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild className='p-3'>
                                 <Button variant="outline" size="icon" className=''>

@@ -40,7 +40,7 @@ export function MenuCard({ menu }: MenuCardProps) {
     const handleToggle = (checked: boolean) => {
         setIsUpdating(true)
         router.put(
-            menusUpdate(menu.id).url,
+            menusUpdate(menu.slug).url,
             { is_active: checked },
             {
                 preserveScroll: true,
@@ -51,7 +51,7 @@ export function MenuCard({ menu }: MenuCardProps) {
 
     const handleDelete = () => {
         setIsDeleting(true)
-        router.delete(menusDestroy(menu.id).url, {
+        router.delete(menusDestroy(menu.slug).url, {
             onSuccess: () => router.visit(menusIndex().url),
             onFinish: () => {
                 setIsDeleting(false)
@@ -61,16 +61,16 @@ export function MenuCard({ menu }: MenuCardProps) {
     }
 
     const handleView = () => {
-        router.visit(menusShow(menu.id).url)
+        router.visit(menusShow(menu.slug).url)
     }
 
     const handleEdit = () => {
-        router.visit(menusShow(menu.id).url)
+        router.visit(menusShow(menu.slug).url)
     }
 
     const handleDuplicate = () => {
         setIsDuplicating(true)
-        router.post(menusDuplicate(menu.id).url, {}, {
+        router.post(menusDuplicate(menu.slug).url, {}, {
             onFinish: () => setIsDuplicating(false),
         })
     }
@@ -78,7 +78,7 @@ export function MenuCard({ menu }: MenuCardProps) {
     const handleTogglePublish = (checked: boolean) => {
         setIsUpdating(true)
         router.put(
-            menusUpdate(menu.id).url,
+            menusUpdate(menu.slug).url,
             { is_active: checked },
             {
                 preserveScroll: true,
@@ -88,11 +88,11 @@ export function MenuCard({ menu }: MenuCardProps) {
     }
 
     const handleViewPublic = () => {
-        window.open(`/cardapio/${menu.id}`, '_blank', 'noopener,noreferrer')
+        window.open(`/cardapio/${menu.slug}`, '_blank', 'noopener,noreferrer')
     }
 
     const handleCardClick = () => {
-        router.visit(menusShow(menu.id).url)
+        router.visit(menusShow(menu.slug).url)
     }
 
     return (

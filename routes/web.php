@@ -29,7 +29,7 @@ require __DIR__.'/payment.php';
 // Subscription Routes
 require __DIR__.'/subscription.php';
 
-Route::get('cardapio/{menu}', [PublicMenuController::class, 'show'])->name('public.menu.show');
+Route::get('cardapio/{menu:slug}', [PublicMenuController::class, 'show'])->name('public.menu.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
