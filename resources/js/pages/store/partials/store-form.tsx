@@ -1,3 +1,10 @@
+import imgBrownie from '@/assets/images/comidas/Brownie.jpg';
+import imgBruschetta from '@/assets/images/comidas/Bruschetta.jpg';
+import imgCarpaccio from '@/assets/images/comidas/Carpaccio.jpg';
+import imgFile from '@/assets/images/comidas/Filé ao molho.jpg';
+import imgPudim from '@/assets/images/comidas/Pudim de leite.jpg';
+import imgRisoto from '@/assets/images/comidas/Risoto de cogumelos.jpg';
+import imgSalada from '@/assets/images/comidas/Salada Caesar.jpg';
 import FormImage1 from '@/assets/images/form/form1.png';
 import FormImage2 from '@/assets/images/form/form2.png';
 import FormImage3 from '@/assets/images/form/form3.png';
@@ -92,32 +99,42 @@ const PREVIEW_SECTIONS: Array<{
         hasImage: boolean;
     }>;
 }> = [
-        {
-            name: 'Entradas',
-            description: 'Para começar bem.',
-            dishes: [
-                { name: 'Bruschetta', description: 'Pão crocante com tomate, manjericão e azeite.', price: 24.9, promotionalPrice: 19.9, hasImage: true },
-                { name: 'Carpaccio', description: 'Fatias finas de carne com rúcula e parmesão.', price: 32, promotionalPrice: null, hasImage: false },
-            ],
-        },
-        {
-            name: 'Pratos principais',
-            description: null,
-            dishes: [
-                { name: 'Filé ao molho', description: 'Filé mignon, batatas e legumes da época.', price: 58, promotionalPrice: 49.9, hasImage: true },
-                { name: 'Risoto de cogumelos', description: 'Arroz arbóreo, cogumelos frescos e parmesão.', price: 42, promotionalPrice: null, hasImage: true },
-                { name: 'Salada Caesar', description: 'Alface, frango grelhado, croutons e molho Caesar.', price: 36, promotionalPrice: null, hasImage: false },
-            ],
-        },
-        {
-            name: 'Sobremesas',
-            description: 'Finalize com doce.',
-            dishes: [
-                { name: 'Brownie', description: 'Brownie de chocolate com sorvete.', price: 22, promotionalPrice: 18, hasImage: true },
-                { name: 'Pudim de leite', description: 'Pudim tradicional com calda de caramelo.', price: 16, promotionalPrice: null, hasImage: false },
-            ],
-        },
-    ];
+    {
+        name: 'Entradas',
+        description: 'Para começar bem.',
+        dishes: [
+            { name: 'Bruschetta', description: 'Pão crocante com tomate, manjericão e azeite.', price: 24.9, promotionalPrice: 19.9, hasImage: true },
+            { name: 'Carpaccio', description: 'Fatias finas de carne com rúcula e parmesão.', price: 32, promotionalPrice: null, hasImage: false },
+        ],
+    },
+    {
+        name: 'Pratos principais',
+        description: null,
+        dishes: [
+            { name: 'Filé ao molho', description: 'Filé mignon, batatas e legumes da época.', price: 58, promotionalPrice: 49.9, hasImage: true },
+            { name: 'Risoto de cogumelos', description: 'Arroz arbóreo, cogumelos frescos e parmesão.', price: 42, promotionalPrice: null, hasImage: true },
+            { name: 'Salada Caesar', description: 'Alface, frango grelhado, croutons e molho Caesar.', price: 36, promotionalPrice: null, hasImage: false },
+        ],
+    },
+    {
+        name: 'Sobremesas',
+        description: 'Finalize com doce.',
+        dishes: [
+            { name: 'Brownie', description: 'Brownie de chocolate com sorvete.', price: 22, promotionalPrice: 18, hasImage: true },
+            { name: 'Pudim de leite', description: 'Pudim tradicional com calda de caramelo.', price: 16, promotionalPrice: null, hasImage: false },
+        ],
+    },
+];
+
+const PREVIEW_DISH_IMAGES: Record<string, string> = {
+    Bruschetta: imgBruschetta,
+    Carpaccio: imgCarpaccio,
+    'Filé ao molho': imgFile,
+    'Risoto de cogumelos': imgRisoto,
+    'Salada Caesar': imgSalada,
+    Brownie: imgBrownie,
+    'Pudim de leite': imgPudim,
+};
 
 function formatPreviewPrice(value: number): string {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -188,7 +205,13 @@ function MenuColorPreview({ colors, storeName, logoImageUrl, backgroundImageUrl 
                                             borderColor: `${cCardText}30`,
                                         }}
                                     >
-                                        {dish.hasImage ? (
+                                        {PREVIEW_DISH_IMAGES[dish.name] ? (
+                                            <img
+                                                src={PREVIEW_DISH_IMAGES[dish.name]}
+                                                alt=""
+                                                className="size-20 shrink-0 rounded-md object-cover"
+                                            />
+                                        ) : dish.hasImage ? (
                                             <div
                                                 className="size-20 shrink-0 rounded-md bg-muted"
                                                 aria-hidden
