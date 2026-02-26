@@ -65,13 +65,13 @@ export default function PublicMenu({
 
     const headerBgStyle = store.background_image
         ? {
-              backgroundImage: `linear-gradient(0deg, rgba(255,255,255,0.9) 0%, rgba(248,248,248,0.75) 100%), url(/storage/${store.background_image})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-          }
+            backgroundImage: `linear-gradient(0deg, rgba(255,255,255,0.9) 0%, rgba(248,248,248,0.75) 100%), url(/storage/${store.background_image})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+        }
         : {
-              background: `linear-gradient(135deg, ${colorGrad1} 0%, ${colorGrad2} 100%)`,
-          };
+            background: `linear-gradient(135deg, ${colorGrad1} 0%, ${colorGrad2} 100%)`,
+        };
 
     return (
         <div
@@ -144,7 +144,7 @@ export default function PublicMenu({
                                 >
                                     {/* Imagem à esquerda */}
                                     {dish.image ? (
-                                        <div className="shrink-0 overflow-hidden rounded-xl bg-[hsl(30_20%_92%)] size-36">
+                                        <div className="shrink-0 overflow-hidden rounded-xl bg-[hsl(30_20%_92%)] size-24 sm:size-36 md:size-52">
                                             <img
                                                 src={`/storage/${dish.image}`}
                                                 alt={dish.name}
@@ -154,7 +154,7 @@ export default function PublicMenu({
                                         </div>
                                     ) : (
                                         <div
-                                            className="size-24 shrink-0 rounded-xl bg-[hsl(30_20%_92%)] sm:size-28"
+                                            className="shrink-0 rounded-xl bg-[hsl(30_20%_92%)] size-24 sm:size-36 md:size-52"
                                             aria-hidden
                                         />
                                     )}
