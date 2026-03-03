@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRequest;
+use App\Models\Store;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -72,32 +74,59 @@ class StoreController extends Controller
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    private function handleImage(
+        Store $store,
+        StoreRequest $request,
+        array &$data,
+        string $field
+    ): void {
+        if (! $request->hasFile($field)) {
+            unset($data[$field]);
+            return;
+        }
+
+        if ($store->{$field}) {
+            Storage::disk('public')->delete($store->{$field});
+        }
+
+        $data[$field] = $request->file($field)->store('stores', 'public');
+    }
+
     public function update(StoreRequest $request, string $id)
     {
-        $store = $request->user()->store()->findOrFail($id);
+        try {
+            $store = $request->user()
+                ->store()
+                ->findOrFail($id);
 
-        $data = $request->validated();
+            $data = collect($request->validated())
+                ->except(['_method'])
+                ->all();
 
-        if ($request->hasFile('logo_image')) {
-            if ($store->logo_image) {
-                Storage::disk('public')->delete($store->logo_image);
+            // 🔥 Garante que não sobrescreva com null
+            if (! $request->hasFile('logo_image')) {
+                unset($data['logo_image']);
             }
-            $data['logo_image'] = $request->file('logo_image')->store('stores', 'public');
-        }
 
-        if ($request->hasFile('background_image')) {
-            if ($store->background_image) {
-                Storage::disk('public')->delete($store->background_image);
+            if (! $request->hasFile('background_image')) {
+                unset($data['background_image']);
             }
-            $data['background_image'] = $request->file('background_image')->store('stores', 'public');
+
+            $this->handleImage($store, $request, $data, 'logo_image');
+            $this->handleImage($store, $request, $data, 'background_image');
+
+            $store->update($data);
+
+            return redirect()->route('stores.index');
+        } catch (\Throwable $e) {
+            Log::error('StoreController@update failed', [
+                'store_id' => $id,
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            throw $e;
         }
-
-        $store->update($data);
-
-        return redirect()->route('stores.index');
     }
 
     /**

@@ -38,7 +38,8 @@ import {
     Trash2,
     Upload,
 } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import type React from 'react';
 import { toast } from 'sonner';
 import { useMaskInput } from 'use-mask-input';
 import OperatingHoursForm from './operating-hours-form';
@@ -261,7 +262,7 @@ interface StoreFormProps {
 }
 
 
-export default function StoreForm({ store: storeData }: StoreFormProps) {
+export default function StoreForm({ store: storeData }: Readonly<StoreFormProps>) {
     const [step, setStep] = useState(0);
 
     const DEFAULT_COLORS_9 = ['#f8fafc', '#e0e7ff', '#c7d2fe', '#1e293b', '#64748b', '#334155', '#ffffff', '#0f172a', '#059669'];
@@ -280,7 +281,7 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
     };
 
     const formOptions = {
-        transform: (formData: StoreFormData) => buildSubmitPayload(formData),
+        transform: (formData: StoreFormData) => buildSubmitPayload(formData, !!storeData),
     };
     const form = (
         useForm as (
@@ -289,7 +290,7 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
         ) => ReturnType<typeof useForm<StoreFormData>>
     )(initialData, formOptions);
 
-    function buildSubmitPayload(formData: StoreFormData): SubmittedStoreFormData {
+    function buildSubmitPayload(formData: StoreFormData, isUpdate: boolean): SubmittedStoreFormData & { _method?: string } {
         const cleanedWhatsapp = formData.whatsapp
             ? formData.whatsapp.replace(/\D/g, '')
             : '';
@@ -321,10 +322,11 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
             operating_hours: transformedOperatingHours,
             ...(logo_image instanceof File && { logo_image }),
             ...(background_image instanceof File && { background_image }),
-        } as SubmittedStoreFormData;
+            ...(isUpdate && { _method: 'PATCH' }),
+        } as SubmittedStoreFormData & { _method?: string };
     }
 
-    const { data, post, patch, processing, errors, setError, clearErrors } =
+    const { data, post, patch, put, processing, setError, clearErrors } =
         form;
 
     const handleNext = () => {
@@ -344,21 +346,38 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const hasFiles = data.logo_image instanceof File || data.background_image instanceof File;
 
+        const showError = (errors: Record<string, string> | undefined) => {
+            const msg = errors && Object.keys(errors).length > 0
+                ? Object.entries(errors)
+                    .map(([field, m]) => `${field}: ${Array.isArray(m) ? m[0] : m}`)
+                    .join(' • ')
+                : 'Ocorreu um erro ao atualizar a loja.';
+            console.error('[StoreForm] Submit error:', errors);
+            toast.error(msg);
+        };
+
         if (storeData) {
-            patch(update(storeData.id).url, {
-                onSuccess: () => toast.success('Loja atualizada com sucesso!'),
-                onError: () => toast.error('Ocorreu um erro ao atualizar a loja.'),
-                forceFormData: hasFiles,
-            });
+            if (hasFiles) {
+                put(update(storeData.id).url, {
+                    onSuccess: () => toast.success('Loja atualizada com sucesso!'),
+                    onError: showError,
+                    forceFormData: true,
+                });
+            } else {
+                patch(update(storeData.id).url, {
+                    onSuccess: () => toast.success('Loja atualizada com sucesso!'),
+                    onError: showError,
+                });
+            }
         } else {
             post(storeRoute().url, {
                 onSuccess: () => toast.success('Loja criada com sucesso!'),
-                onError: () => toast.error('Ocorreu um erro ao criar a loja.'),
+                onError: showError,
                 forceFormData: hasFiles,
             });
         }
@@ -405,7 +424,7 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
                             step={step}
                             steps={steps.map((s) => s.name)}
                             setStep={() => {
-                                setStep(step);
+                                setStep((prev) => prev ?? 0);
                             }}
                         />
                     </CardHeader>
@@ -481,7 +500,7 @@ export default function StoreForm({ store: storeData }: StoreFormProps) {
     );
 }
 
-function Step1({ form, store }: StepProps) {
+function Step1({ form, store }: Readonly<StepProps>) {
     const { data, setData, errors } = form;
 
     const logoPreview = data.logo_image instanceof File
@@ -573,7 +592,7 @@ function Step1({ form, store }: StepProps) {
                                     <button
                                         type="button"
                                         onClick={() => setData('logo_image', null)}
-                                        className="rounded bg-background/90 px-2 py-1 text-xs font-medium text-destructive"
+                                        className="rounded cursor-pointer bg-background/90 px-2 py-1 text-xs font-medium text-destructive z-10"
                                     >
                                         Remover
                                     </button>
@@ -682,7 +701,7 @@ function Step1({ form, store }: StepProps) {
     );
 }
 
-function Step2({ form }: StepProps) {
+function Step2({ form }: Readonly<StepProps>) {
     const { data, setData, errors } = form;
 
     const documentRef = useMaskInput(
@@ -718,7 +737,7 @@ function Step2({ form }: StepProps) {
             <div className="space-y-2">
                 <Label>Telefones (até 3)</Label>
                 {data.phones?.map((phone, index) => (
-                    <div key={index} className="flex items-center gap-2 mr-8">
+                    <div key={phone || 'phone-empty'} className="flex items-center gap-2 mr-8">
                         <div className="relative flex-1">
                             <Phone className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
                             <PhoneInput
@@ -842,7 +861,7 @@ function Step2({ form }: StepProps) {
     );
 }
 
-function Step3({ form }: StepProps) {
+function Step3({ form }: Readonly<StepProps>) {
     const { data, setData } = form;
 
     return (

@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class StoreRequest extends FormRequest
 {
@@ -12,6 +15,31 @@ class StoreRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $input = $this->all();
+        if (array_key_exists('logo_image', $input) && ! $this->hasFile('logo_image')) {
+            $input['logo_image'] = null;
+            $this->merge($input);
+        }
+        if (array_key_exists('background_image', $input) && ! $this->hasFile('background_image')) {
+            $input['background_image'] = null;
+            $this->merge($input);
+        }
+    }
+
+    protected function failedValidation(Validator $validator): void
+    {
+        Log::warning('StoreRequest validation failed', [
+            'errors' => $validator->errors()->toArray(),
+            'input_keys' => array_keys($this->except(['logo_image', 'background_image'])),
+            'has_logo_file' => $this->hasFile('logo_image'),
+            'has_background_file' => $this->hasFile('background_image'),
+        ]);
+
+        throw new ValidationException($validator);
     }
 
     /**
@@ -24,7 +52,7 @@ class StoreRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'logo_image' => ['nullable', 'image', 'max:2048'],
-            'background_image' => ['nullable', 'image', 'max:2048'],
+            'background_image' => ['nullable', 'image', 'max:12288'],
             'phones' => ['nullable', 'array', 'max:3'],
             'phones.*' => ['nullable', 'string', function (string $attribute, mixed $value, \Closure $fail) {
                 $digits = preg_replace('/\D/', '', (string) $value);
