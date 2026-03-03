@@ -22,13 +22,15 @@ import {
 import React from 'react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
+import { EmptyState } from './emptyList'
 
-interface SubscriptionsTableProps {
-    columns: ColumnDef<any>[]
-    data: any[]
+interface Subscription {
+    id: number;
+    plan_name: string;
+    next_billing_date: string | null;
 }
 
-export function SubscriptionsTable({ columns, data }: SubscriptionsTableProps) {
+export function SubscriptionsTable({ columns, data }: Readonly<{ columns: ColumnDef<Subscription>[], data: Subscription[] }>) {
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] =
         React.useState<ColumnFiltersState>([])
@@ -76,10 +78,10 @@ export function SubscriptionsTable({ columns, data }: SubscriptionsTableProps) {
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
-                                                      header.column.columnDef
-                                                          .header,
-                                                      header.getContext()
-                                                  )}
+                                                    header.column.columnDef
+                                                        .header,
+                                                    header.getContext()
+                                                )}
                                         </TableHead>
                                     )
                                 })}
@@ -111,7 +113,12 @@ export function SubscriptionsTable({ columns, data }: SubscriptionsTableProps) {
                                     colSpan={columns.length}
                                     className="h-24 text-center"
                                 >
-                                    Nenhuma cobrança encontrada.
+                                    <EmptyState.Root>
+                                        <EmptyState.Title>Nenhuma assinatura encontrada</EmptyState.Title>
+                                        <EmptyState.Description>
+                                            Escolha um plano para começar a usar todos os recursos
+                                        </EmptyState.Description>
+                                    </EmptyState.Root>
                                 </TableCell>
                             </TableRow>
                         )}

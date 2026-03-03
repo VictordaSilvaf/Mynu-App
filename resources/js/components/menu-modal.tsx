@@ -17,12 +17,15 @@ import {
     DrawerTrigger,
 } from "@/components/ui/drawer"
 import { useForm } from "@inertiajs/react";
+import { Plus } from "lucide-react";
 
 interface MenuModalProps {
     storeComplete?: boolean;
+    openModal: boolean;
+    setOpenModal: (open: boolean) => void;
 }
 
-export default function MenuModal({ storeComplete = true }: MenuModalProps) {
+export default function MenuModal({ storeComplete = true, openModal, setOpenModal }: Readonly<MenuModalProps>) {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
     });
@@ -36,12 +39,15 @@ export default function MenuModal({ storeComplete = true }: MenuModalProps) {
 
     return (
         <div>
-            <Drawer direction="right">
+            <Drawer direction="right" open={openModal} onOpenChange={setOpenModal}>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <span className="inline-flex">
                             <DrawerTrigger asChild>
-                                <Button disabled={!storeComplete}>Adicionar Cardápio</Button>
+                                <Button disabled={!storeComplete}>
+                                    <Plus className="size-4" />
+                                    Adicionar Cardápio
+                                </Button>
                             </DrawerTrigger>
                         </span>
                     </TooltipTrigger>
@@ -70,7 +76,10 @@ export default function MenuModal({ storeComplete = true }: MenuModalProps) {
                             </div>
                         </div>
                         <DrawerFooter>
-                            <Button type="submit" disabled={processing}>Criar Cardápio</Button>
+                            <Button type="submit" disabled={processing}>
+                                <Plus className="size-4" />
+                                Criar Cardápio
+                            </Button>
                             <DrawerClose asChild>
                                 <Button variant="outline">Cancelar</Button>
                             </DrawerClose>

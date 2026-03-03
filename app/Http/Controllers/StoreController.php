@@ -103,17 +103,32 @@ class StoreController extends Controller
                 ->except(['_method'])
                 ->all();
 
-            // 🔥 Garante que não sobrescreva com null
-            if (! $request->hasFile('logo_image')) {
+            $removeLogo = (bool) ($data['remove_logo_image'] ?? false);
+            $removeBackground = (bool) ($data['remove_background_image'] ?? false);
+
+            unset($data['remove_logo_image'], $data['remove_background_image']);
+
+            if ($request->hasFile('logo_image')) {
+                $this->handleImage($store, $request, $data, 'logo_image');
+            } elseif ($removeLogo) {
+                if ($store->logo_image) {
+                    Storage::disk('public')->delete($store->logo_image);
+                }
+                $data['logo_image'] = null;
+            } else {
                 unset($data['logo_image']);
             }
 
-            if (! $request->hasFile('background_image')) {
+            if ($request->hasFile('background_image')) {
+                $this->handleImage($store, $request, $data, 'background_image');
+            } elseif ($removeBackground) {
+                if ($store->background_image) {
+                    Storage::disk('public')->delete($store->background_image);
+                }
+                $data['background_image'] = null;
+            } else {
                 unset($data['background_image']);
             }
-
-            $this->handleImage($store, $request, $data, 'logo_image');
-            $this->handleImage($store, $request, $data, 'background_image');
 
             $store->update($data);
 

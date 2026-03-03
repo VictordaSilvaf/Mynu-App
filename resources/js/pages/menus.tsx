@@ -27,6 +27,8 @@ import {
     rectSortingStrategy,
 } from "@dnd-kit/sortable"
 import MenuModal from '@/components/menu-modal';
+import { EmptyState } from '@/components/emptyList';
+import EmptyListAnimation from '@/assets/animations/empty_ghost.lottie';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -41,9 +43,10 @@ interface MenusProps extends PageProps {
     storeComplete?: boolean;
 }
 
-export default function Menus({ menus: menuData, hasStore, storeComplete = true }: MenusProps) {
+export default function Menus({ menus: menuData, hasStore, storeComplete = true }: Readonly<MenusProps>) {
     const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid')
     const [items, setItems] = useState<Menu[]>(menuData)
+    const [openModal, setOpenModal] = useState(false)
 
     React.useEffect(() => {
         setItems(menuData)
@@ -116,7 +119,7 @@ export default function Menus({ menus: menuData, hasStore, storeComplete = true 
                             <TableIcon className="h-4 w-4" />
                         </Button>
                     </div>
-                    <MenuModal storeComplete={storeComplete} />
+                    <MenuModal storeComplete={storeComplete} openModal={openModal} setOpenModal={setOpenModal} />
                 </div>
 
                 {viewMode === 'table' ? (
@@ -141,9 +144,16 @@ export default function Menus({ menus: menuData, hasStore, storeComplete = true 
                                         <MenuCard key={menu.id} menu={menu} />
                                     ))
                                 ) : (
-                                    <div className="col-span-full text-center py-12 text-muted-foreground">
-                                        Nenhum cardápio encontrado.
-                                    </div>
+                                    <EmptyState.Root>
+                                        <EmptyState.Animation src={EmptyListAnimation} />
+                                        <EmptyState.Title>Nenhum cardápio encontrado</EmptyState.Title>
+                                        <EmptyState.Description>
+                                            Crie seu primeiro cardápio para começar a vender online.
+                                        </EmptyState.Description>
+                                        <EmptyState.Action onClick={() => setOpenModal(true)}>
+                                            Criar cardápio
+                                        </EmptyState.Action>
+                                    </EmptyState.Root>
                                 )}
                             </div>
                         </SortableContext>

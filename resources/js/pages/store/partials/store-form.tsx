@@ -53,6 +53,8 @@ type StoreFormData = Omit<
     colors: string[];
     logo_image: File | null;
     background_image: File | null;
+    remove_logo_image?: boolean;
+    remove_background_image?: boolean;
 };
 
 type SubmittedOperatingHours = Array<{
@@ -278,6 +280,8 @@ export default function StoreForm({ store: storeData }: Readonly<StoreFormProps>
         instagram: '',
         document_type: 'cpf',
         document_number: '',
+        remove_logo_image: false,
+        remove_background_image: false,
     };
 
     const formOptions = {
@@ -314,7 +318,13 @@ export default function StoreForm({ store: storeData }: Readonly<StoreFormProps>
             }
             return acc;
         }, [] as SubmittedOperatingHours);
-        const { logo_image, background_image, ...rest } = formData;
+        const {
+            logo_image,
+            background_image,
+            remove_logo_image,
+            remove_background_image,
+            ...rest
+        } = formData;
         return {
             ...rest,
             phones: formData.phones.map(transformPhone).filter(Boolean),
@@ -322,6 +332,8 @@ export default function StoreForm({ store: storeData }: Readonly<StoreFormProps>
             operating_hours: transformedOperatingHours,
             ...(logo_image instanceof File && { logo_image }),
             ...(background_image instanceof File && { background_image }),
+            ...(isUpdate && remove_logo_image && { remove_logo_image: true }),
+            ...(isUpdate && remove_background_image && { remove_background_image: true }),
             ...(isUpdate && { _method: 'PATCH' }),
         } as SubmittedStoreFormData & { _method?: string };
     }
@@ -404,7 +416,10 @@ export default function StoreForm({ store: storeData }: Readonly<StoreFormProps>
             instagram: storeData.instagram ?? '',
             document_type: storeData.document_type ?? 'cpf',
             document_number: storeData.document_number ?? '',
+            remove_logo_image: false,
+            remove_background_image: false,
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- only hydrate when storeData (prop) changes, not when form reference changes
     }, [storeData]);
 
     return (
@@ -502,15 +517,17 @@ export default function StoreForm({ store: storeData }: Readonly<StoreFormProps>
 
 function Step1({ form, store }: Readonly<StepProps>) {
     const { data, setData, errors } = form;
+    const [hideLogoPreview, setHideLogoPreview] = useState(false);
+    const [hideBackgroundPreview, setHideBackgroundPreview] = useState(false);
 
     const logoPreview = data.logo_image instanceof File
         ? URL.createObjectURL(data.logo_image)
-        : store?.logo_image
+        : store?.logo_image && !hideLogoPreview
             ? `/storage/${store.logo_image}`
             : null;
     const backgroundPreview = data.background_image instanceof File
         ? URL.createObjectURL(data.background_image)
-        : store?.background_image
+        : store?.background_image && !hideBackgroundPreview
             ? `/storage/${store.background_image}`
             : null;
 
@@ -586,12 +603,23 @@ function Step1({ form, store }: Readonly<StepProps>) {
                                             type="file"
                                             accept="image/*"
                                             className="hidden"
-                                            onChange={(e) => setData('logo_image', e.target.files?.[0] ?? null)}
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0] ?? null;
+                                                setData('logo_image', file);
+                                                if (file) {
+                                                    setHideLogoPreview(false);
+                                                    setData('remove_logo_image', false);
+                                                }
+                                            }}
                                         />
                                     </label>
                                     <button
                                         type="button"
-                                        onClick={() => setData('logo_image', null)}
+                                        onClick={() => {
+                                            setData('logo_image', null);
+                                            setHideLogoPreview(true);
+                                            setData('remove_logo_image', true);
+                                        }}
                                         className="rounded cursor-pointer bg-background/90 px-2 py-1 text-xs font-medium text-destructive z-10"
                                     >
                                         Remover
@@ -606,7 +634,14 @@ function Step1({ form, store }: Readonly<StepProps>) {
                                     type="file"
                                     accept="image/*"
                                     className="hidden"
-                                    onChange={(e) => setData('logo_image', e.target.files?.[0] ?? null)}
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0] ?? null;
+                                        setData('logo_image', file);
+                                        if (file) {
+                                            setHideLogoPreview(false);
+                                            setData('remove_logo_image', false);
+                                        }
+                                    }}
                                 />
                             </label>
                         )}
@@ -626,12 +661,23 @@ function Step1({ form, store }: Readonly<StepProps>) {
                                             type="file"
                                             accept="image/*"
                                             className="hidden"
-                                            onChange={(e) => setData('background_image', e.target.files?.[0] ?? null)}
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0] ?? null;
+                                                setData('background_image', file);
+                                                if (file) {
+                                                    setHideBackgroundPreview(false);
+                                                    setData('remove_background_image', false);
+                                                }
+                                            }}
                                         />
                                     </label>
                                     <button
                                         type="button"
-                                        onClick={() => setData('background_image', null)}
+                                        onClick={() => {
+                                            setData('background_image', null);
+                                            setHideBackgroundPreview(true);
+                                            setData('remove_background_image', true);
+                                        }}
                                         className="rounded bg-background/90 px-2 py-1 text-xs font-medium text-destructive"
                                     >
                                         Remover
@@ -646,7 +692,14 @@ function Step1({ form, store }: Readonly<StepProps>) {
                                     type="file"
                                     accept="image/*"
                                     className="hidden"
-                                    onChange={(e) => setData('background_image', e.target.files?.[0] ?? null)}
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0] ?? null;
+                                        setData('background_image', file);
+                                        if (file) {
+                                            setHideBackgroundPreview(false);
+                                            setData('remove_background_image', false);
+                                        }
+                                    }}
                                 />
                             </label>
                         )}
@@ -737,7 +790,7 @@ function Step2({ form }: Readonly<StepProps>) {
             <div className="space-y-2">
                 <Label>Telefones (até 3)</Label>
                 {data.phones?.map((phone, index) => (
-                    <div key={phone || 'phone-empty'} className="flex items-center gap-2 mr-8">
+                    <div key={`phone-${index}`} className="flex items-center gap-2 mr-8">
                         <div className="relative flex-1">
                             <Phone className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
                             <PhoneInput

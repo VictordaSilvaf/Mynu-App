@@ -53,6 +53,8 @@ class StoreRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'logo_image' => ['nullable', 'image', 'max:2048'],
             'background_image' => ['nullable', 'image', 'max:12288'],
+            'remove_logo_image' => ['sometimes', 'boolean'],
+            'remove_background_image' => ['sometimes', 'boolean'],
             'phones' => ['nullable', 'array', 'max:3'],
             'phones.*' => ['nullable', 'string', function (string $attribute, mixed $value, \Closure $fail) {
                 $digits = preg_replace('/\D/', '', (string) $value);
