@@ -35,6 +35,7 @@ export function SubscriptionsTable({ columns, data }: Readonly<{ columns: Column
     const [columnFilters, setColumnFilters] =
         React.useState<ColumnFiltersState>([])
 
+    // eslint-disable-next-line react-hooks/incompatible-library
     const table = useReactTable({
         data,
         columns,
