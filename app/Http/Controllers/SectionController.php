@@ -17,7 +17,7 @@ class SectionController extends Controller
     {
         $menu = Menu::findOrFail($request->menu_id);
 
-        $this->authorize('update', $menu);
+        $this->authorize('editContent', $menu);
 
         $section = $menu->sections()->create($request->validated());
 
@@ -26,7 +26,7 @@ class SectionController extends Controller
 
     public function update(UpdateSectionRequest $request, Section $section): RedirectResponse
     {
-        $this->authorize('update', $section->menu);
+        $this->authorize('editContent', $section->menu);
 
         $section->update($request->validated());
 
@@ -35,7 +35,7 @@ class SectionController extends Controller
 
     public function destroy(Section $section): RedirectResponse
     {
-        $this->authorize('update', $section->menu);
+        $this->authorize('editContent', $section->menu);
 
         $section->delete();
 
@@ -52,7 +52,7 @@ class SectionController extends Controller
 
         foreach ($validated['sections'] as $sectionData) {
             $section = Section::find($sectionData['id']);
-            $this->authorize('update', $section->menu);
+            $this->authorize('editContent', $section->menu);
             $section->update(['order' => $sectionData['order']]);
         }
 

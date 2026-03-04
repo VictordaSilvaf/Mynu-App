@@ -18,7 +18,7 @@ class DishController extends Controller
     {
         $section = Section::findOrFail($request->section_id);
 
-        $this->authorize('update', $section->menu);
+        $this->authorize('editContent', $section->menu);
 
         $data = $request->validated();
 
@@ -35,7 +35,7 @@ class DishController extends Controller
 
     public function update(UpdateDishRequest $request, Dish $dish): RedirectResponse
     {
-        $this->authorize('update', $dish->section->menu);
+        $this->authorize('editContent', $dish->section->menu);
 
         $data = $request->validated();
 
@@ -54,7 +54,7 @@ class DishController extends Controller
 
     public function destroy(Dish $dish): RedirectResponse
     {
-        $this->authorize('update', $dish->section->menu);
+        $this->authorize('editContent', $dish->section->menu);
 
         if ($dish->image) {
             Storage::disk('public')->delete($dish->image);

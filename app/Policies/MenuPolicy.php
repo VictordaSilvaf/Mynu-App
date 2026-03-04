@@ -45,6 +45,25 @@ class MenuPolicy
     }
 
     /**
+     * Determine whether the user can edit sections and dishes (content) of this menu.
+     * Free: only the first menu (by order). Pro/Enterprise/Admin: any menu they own.
+     */
+    public function editContent(User $user, Menu $menu): bool
+    {
+        if (! $this->update($user, $menu)) {
+            return false;
+        }
+
+        if ($user->hasRole('admin') || $user->hasRole('pro') || $user->hasRole('enterprise')) {
+            return true;
+        }
+
+        $firstMenu = $menu->store->menus()->orderBy('order')->first();
+
+        return $firstMenu && $firstMenu->id === $menu->id;
+    }
+
+    /**
      * Determine whether the user can delete the model.
      */
     public function delete(User $user, Menu $menu): bool

@@ -159,9 +159,9 @@ export default function ShowMenu({ menu, canEditSections = false }: Readonly<Sho
                 {!canEditSections && (
                     <Alert>
                         <Lock className="size-4" />
-                        <AlertTitle>Recurso dos planos Pro e Enterprise</AlertTitle>
+                        <AlertTitle>Limite do plano Free</AlertTitle>
                         <AlertDescription>
-                            Crie sessões e pratos apenas nos planos Pro ou Enterprise. Faça upgrade para desbloquear.
+                            No plano Free você pode ter apenas um cardápio completo (com sessões e pratos). Faça upgrade para Pro ou Enterprise e desbloqueie mais cardápios.
                         </AlertDescription>
                     </Alert>
                 )}

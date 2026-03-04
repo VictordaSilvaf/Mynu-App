@@ -61,7 +61,7 @@ class MenuController extends Controller
             'sections' => fn ($query) => $query->with('dishes')->orderBy('order'),
         ]);
 
-        $canEditSections = $request->user()->hasRole('pro') || $request->user()->hasRole('enterprise');
+        $canEditSections = $request->user()->can('editContent', $menu);
 
         return Inertia::render('menus/show', [
             'menu' => $menu,
@@ -73,10 +73,15 @@ class MenuController extends Controller
     {
         $this->authorize('update', $menu);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'is_active' => 'nullable|boolean',
-        ]);
+        $rules = [
+            'is_active' => ['nullable', 'boolean'],
+        ];
+
+        if ($request->has('name')) {
+            $rules['name'] = ['required', 'string', 'max:255'];
+        }
+
+        $validated = $request->validate($rules);
 
         $menu->update($validated);
 

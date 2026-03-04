@@ -5,9 +5,9 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dish } from '@/types';
-import { FormEventHandler, useEffect, useState } from 'react';
+import { SubmitEventHandler, useEffect, useState } from 'react';
 import InputError from '@/components/input-error';
-import { ImageIcon, Upload, X } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 import dishes from '@/routes/dishes';
 
 interface DishModalProps {
@@ -19,7 +19,7 @@ interface DishModalProps {
 
 export function DishModal({ open, onOpenChange, sectionId, dish }: Readonly<DishModalProps>) {
     const [previewImage, setPreviewImage] = useState<string | null>(null);
-    
+
     const { data, setData, post, put, processing, errors, reset } = useForm({
         section_id: sectionId,
         name: dish?.name || '',
@@ -46,6 +46,7 @@ export function DishModal({ open, onOpenChange, sectionId, dish }: Readonly<Dish
                 is_available: dish.is_available,
             });
             if (dish.image) {
+                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setPreviewImage(`/storage/${dish.image}`);
             }
         } else {
@@ -72,12 +73,12 @@ export function DishModal({ open, onOpenChange, sectionId, dish }: Readonly<Dish
         setPreviewImage(null);
     };
 
-    const handleSubmit: FormEventHandler = (e) => {
+    const handleSubmit: SubmitEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
 
         const url = dish ? dishes.update(dish.id).url : dishes.store().url;
         const submit = dish ? put : post;
-        
+
         submit(url, {
             onSuccess: () => {
                 onOpenChange(false);
@@ -96,7 +97,7 @@ export function DishModal({ open, onOpenChange, sectionId, dish }: Readonly<Dish
                         {dish ? 'Editar Prato' : 'Novo Prato'}
                     </DialogTitle>
                     <DialogDescription>
-                        {dish 
+                        {dish
                             ? 'Atualize as informações do prato.'
                             : 'Adicione um novo prato ao seu cardápio.'
                         }
@@ -161,7 +162,7 @@ export function DishModal({ open, onOpenChange, sectionId, dish }: Readonly<Dish
                                 step="0.01"
                                 min="0"
                                 value={data.price}
-                                onChange={(e) => setData('price', parseFloat(e.target.value) || 0)}
+                                onChange={(e) => setData('price', Number.parseFloat(e.target.value) || 0)}
                                 placeholder="0.00"
                             />
                             <InputError message={errors.price} />
@@ -177,7 +178,7 @@ export function DishModal({ open, onOpenChange, sectionId, dish }: Readonly<Dish
                                 value={data.promotional_price === '' ? '' : data.promotional_price}
                                 onChange={(e) => {
                                     const v = e.target.value;
-                                    setData('promotional_price', v === '' ? '' : parseFloat(v) || 0);
+                                    setData('promotional_price', v === '' ? '' : Number.parseFloat(v) || 0);
                                 }}
                                 placeholder="Opcional"
                             />
@@ -190,7 +191,7 @@ export function DishModal({ open, onOpenChange, sectionId, dish }: Readonly<Dish
                                 id="order"
                                 type="number"
                                 value={data.order}
-                                onChange={(e) => setData('order', parseInt(e.target.value) || 0)}
+                                onChange={(e) => setData('order', Number.parseInt(e.target.value) || 0)}
                                 min="0"
                             />
                             <InputError message={errors.order} />

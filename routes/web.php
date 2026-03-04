@@ -47,11 +47,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('stores', StoreController::class)->only(['index', 'store', 'update']);
 
-    Route::middleware(['role:pro|enterprise'])->group(function () {
-        Route::post('sections/reorder', [SectionController::class, 'reorder'])->name('sections.reorder');
-        Route::resource('sections', SectionController::class)->only(['store', 'update', 'destroy']);
-        Route::resource('dishes', DishController::class)->only(['store', 'update', 'destroy']);
-    });
+    Route::post('sections/reorder', [SectionController::class, 'reorder'])->name('sections.reorder');
+    Route::resource('sections', SectionController::class)->only(['store', 'update', 'destroy']);
+    Route::resource('dishes', DishController::class)->only(['store', 'update', 'destroy']);
 });
 
 require __DIR__.'/settings.php';
